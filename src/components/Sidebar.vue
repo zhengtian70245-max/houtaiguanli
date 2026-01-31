@@ -20,8 +20,18 @@
             </el-icon>
             <span>课程管理</span>
           </template>
-          <el-menu-item index="/course/list">课程列表</el-menu-item>
-          <el-menu-item index="/course/category">课程分类</el-menu-item>
+          <el-menu-item index="/course/list">
+            <el-icon><Document /></el-icon>
+            <span>课程列表</span>
+          </el-menu-item>
+          <el-menu-item index="/course/category">
+            <el-icon><Folder /></el-icon>
+            <span>课程分类</span>
+          </el-menu-item>
+          <el-menu-item index="/course/material">
+            <el-icon><VideoCameraFilled /></el-icon>
+            <span>素材库</span>
+          </el-menu-item>
         </el-sub-menu>
 
         <el-sub-menu index="/activity">
@@ -140,7 +150,10 @@ import {
   PriceTag,
   Present,
   Share,
-  DataAnalysis
+  DataAnalysis,
+  VideoCameraFilled,
+  Document,
+  Folder
 } from '@element-plus/icons-vue'
 
 const router = useRouter()

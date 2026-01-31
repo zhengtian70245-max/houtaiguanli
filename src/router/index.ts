@@ -119,6 +119,24 @@ const routes: RouteRecordRaw[] = [
         name: 'CourseStats',
         component: () => import('@/views/course/stats.vue'),
         meta: { title: '课程统计', icon: 'TrendCharts' }
+      },
+      {
+        path: '/course/material',
+        name: 'CourseMaterial',
+        component: () => import('@/views/course/material/list.vue'),
+        meta: { title: '素材库', icon: 'VideoCameraFilled' }
+      },
+      {
+        path: '/course/material/edit/:id?',
+        name: 'CourseMaterialEdit',
+        component: () => import('@/views/course/material/edit.vue'),
+        meta: { title: '素材编辑', hidden: true }
+      },
+      {
+        path: '/course/detail/:id',
+        name: 'CourseDetail',
+        component: () => import('@/views/course/detail.vue'),
+        meta: { title: '课程详情', hidden: true }
       }
     ]
   },
