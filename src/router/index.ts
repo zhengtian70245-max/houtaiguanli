@@ -141,6 +141,39 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/column',
+    name: 'Column',
+    component: () => import('@/layouts/MainLayout.vue'),
+    redirect: '/column/list',
+    meta: { title: '专栏管理', icon: 'CollectionTag' },
+    children: [
+      {
+        path: '/column/list',
+        name: 'ColumnList',
+        component: () => import('@/views/column/list.vue'),
+        meta: { title: '专栏列表', icon: 'List' }
+      },
+      {
+        path: '/column/category',
+        name: 'ColumnCategory',
+        component: () => import('@/views/column/category.vue'),
+        meta: { title: '专栏分类', icon: 'Tickets' }
+      },
+      {
+        path: '/column/detail/:id',
+        name: 'ColumnDetail',
+        component: () => import('@/views/column/detail.vue'),
+        meta: { title: '专栏详情', hidden: true }
+      },
+      {
+        path: '/column/create',
+        name: 'ColumnCreate',
+        component: () => import('@/views/column/detail.vue'),
+        meta: { title: '创建专栏', hidden: true }
+      }
+    ]
+  },
+  {
     path: '/activity',
     name: 'Activity',
     component: () => import('@/layouts/MainLayout.vue'),

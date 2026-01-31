@@ -34,6 +34,23 @@
           </el-menu-item>
         </el-sub-menu>
 
+        <el-sub-menu index="/column">
+          <template #title>
+            <el-icon>
+              <CollectionTag />
+            </el-icon>
+            <span>专栏管理</span>
+          </template>
+          <el-menu-item index="/column/list">
+            <el-icon><List /></el-icon>
+            <span>专栏列表</span>
+          </el-menu-item>
+          <el-menu-item index="/column/category">
+            <el-icon><Tickets /></el-icon>
+            <span>专栏分类</span>
+          </el-menu-item>
+        </el-sub-menu>
+
         <el-sub-menu index="/activity">
           <template #title>
             <el-icon>
