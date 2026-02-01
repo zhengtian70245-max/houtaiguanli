@@ -4,81 +4,90 @@
       <h2>分销商列表</h2>
     </div>
     <div class="page-content">
-      <el-form :inline="true" :model="queryForm" class="search-form">
-        <el-form-item label="用户昵称">
-          <el-input v-model="queryForm.nickname" placeholder="请输入用户昵称" clearable />
-        </el-form-item>
-        <el-form-item label="手机号">
-          <el-input v-model="queryForm.phone" placeholder="请输入手机号" clearable />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="queryForm.status" placeholder="请选择状态" clearable>
-            <el-option label="全部" :value="-1" />
-            <el-option label="正常" :value="1" />
-            <el-option label="已禁用" :value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="注册时间">
-          <el-date-picker
+      <a-form :model="queryForm" class="search-form">
+        <a-form-item label="用户昵称">
+          <a-input v-model="queryForm.nickname" placeholder="请输入用户昵称" allow-clear />
+        </a-form-item>
+        <a-form-item label="手机号">
+          <a-input v-model="queryForm.phone" placeholder="请输入手机号" allow-clear />
+        </a-form-item>
+        <a-form-item label="状态">
+          <a-select v-model="queryForm.status" placeholder="请选择状态" allow-clear>
+            <a-option label="全部" :value="-1" />
+            <a-option label="正常" :value="1" />
+            <a-option label="已禁用" :value="0" />
+          </a-select>
+        </a-form-item>
+        <a-form-item label="注册时间">
+          <a-date-picker
             v-model="queryForm.dateRange"
             type="daterange"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
+            placeholder="开始日期"
+            placeholder-end="结束日期"
+            format="YYYY-MM-DD"
             value-format="YYYY-MM-DD"
           />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="handleSearch">搜索</a-button>
+          <a-button @click="handleReset">重置</a-button>
+        </a-form-item>
+      </a-form>
 
-      <el-table :data="tableData" style="width: 100%" border stripe>
-        <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="nickname" label="用户昵称" width="120" />
-        <el-table-column prop="phone" label="手机号" width="130" align="center" />
-        <el-table-column prop="joinDate" label="加入时间" width="150" align="center" />
-        <el-table-column prop="status" label="状态" width="100" align="center">
-          <template #default="{ row }">
-            <el-switch :model-value="row.status" @change="toggleStatus(row)" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="directCount" label="直接下级" width="120" align="center" />
-        <el-table-column prop="indirectCount" label="间接下级" width="120" align="center" />
-        <el-table-column prop="totalCount" label="总下级" width="120" align="center" />
-        <el-table-column prop="totalIncome" label="累计收入" width="150" align="right">
-          <template #default="{ row }">
-            ¥{{ row.totalIncome.toFixed(2) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="pendingIncome" label="待结算收入" width="150" align="right">
-          <template #default="{ row }">
-            ¥{{ row.pendingIncome.toFixed(2) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="settledIncome" label="已结算收入" width="150" align="right">
-          <template #default="{ row }">
-            ¥{{ row.settledIncome.toFixed(2) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" align="center">
-          <template #default="{ row }">
-            <el-button type="primary" size="small" @click="viewDetail(row)">查看详情</el-button>
-            <el-button type="success" size="small" @click="viewTree(row)">查看推广树</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <a-table
+        :data="tableData"
+        :loading="loading"
+        :pagination="false"
+        border
+        stripe
+      >
+        <template #columns>
+          <a-table-column title="ID" data-index="id" :width="80" align="center" />
+          <a-table-column title="用户昵称" data-index="nickname" :width="120" />
+          <a-table-column title="手机号" data-index="phone" :width="130" align="center" />
+          <a-table-column title="加入时间" data-index="joinDate" :width="150" align="center" />
+          <a-table-column title="状态" :width="100" align="center">
+            <template #cell="{ record }">
+              <a-switch :checked="record.status === 1" @change="toggleStatus(record)" />
+            </template>
+          </a-table-column>
+          <a-table-column title="直接下级" data-index="directCount" :width="120" align="center" />
+          <a-table-column title="间接下级" data-index="indirectCount" :width="120" align="center" />
+          <a-table-column title="总下级" data-index="totalCount" :width="120" align="center" />
+          <a-table-column title="累计收入" :width="150" align="right">
+            <template #cell="{ record }">
+              ¥{{ record.totalIncome.toFixed(2) }}
+            </template>
+          </a-table-column>
+          <a-table-column title="待结算收入" :width="150" align="right">
+            <template #cell="{ record }">
+              ¥{{ record.pendingIncome.toFixed(2) }}
+            </template>
+          </a-table-column>
+          <a-table-column title="已结算收入" :width="150" align="right">
+            <template #cell="{ record }">
+              ¥{{ record.settledIncome.toFixed(2) }}
+            </template>
+          </a-table-column>
+          <a-table-column title="操作" :width="200" align="center">
+            <template #cell="{ record }">
+              <a-button type="primary" size="small" @click="viewDetail(record)">查看详情</a-button>
+              <a-button type="success" size="small" @click="viewTree(record)">查看推广树</a-button>
+            </template>
+          </a-table-column>
+        </template>
+      </a-table>
 
       <div class="pagination-wrapper">
-        <el-pagination
-          v-model:current-page="pagination.page"
-          v-model="pagination.page"
-          :page-size="pagination.size"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
+        <a-pagination
+          v-model:current="pagination.page"
+          v-model:page-size="pagination.size"
+          :page-size-options="['10', '20', '50', '100']"
+          show-size-changer
+          show-total
           :total="pagination.total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+          @change="handleCurrentChange"
+          @page-size-change="handleSizeChange"
         />
       </div>
     </div>
@@ -87,7 +96,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import message from '@arco-design/web-vue/es/message'
 
 const loading = ref(false)
 
@@ -106,23 +115,23 @@ const pagination = reactive({
 
 const tableData = ref<any[]>([])
 
-function toggleStatus(row: any) {
-  row.status = row.status ? 0 : 1
-  const message = row.status ? '启用成功' : '禁用成功'
-  ElMessage.success(message)
+function toggleStatus(record: any) {
+  record.status = record.status === 1 ? 0 : 1
+  const messageText = record.status === 1 ? '启用成功' : '禁用成功'
+  message.success(messageText)
 }
 
-function viewDetail(row: any) {
-  console.log('查看详情:', row)
+function viewDetail(record: any) {
+  console.log('查看详情:', record)
 }
 
-function viewTree(row: any) {
-  console.log('查看推广树:', row)
+function viewTree(record: any) {
+  console.log('查看推广树:', record)
 }
 
 function fetchData() {
   const list = Array.from({ length: 10 }).map((_, index) => {
-    const offset = pagination.page * pagination.size
+    const offset = (pagination.page - 1) * pagination.size
     const id = index + offset
     return {
       id,

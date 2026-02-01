@@ -4,103 +4,120 @@
       <h2>订单列表</h2>
     </div>
     <div class="page-content">
-      <el-form :inline="true" :model="queryForm" class="search-form">
-        <el-form-item label="订单号">
-          <el-input v-model="queryForm.orderNo" placeholder="请输入订单号" clearable />
-        </el-form-item>
-        <el-form-item label="用户昵称">
-          <el-input v-model="queryForm.nickname" placeholder="请输入用户昵称" clearable />
-        </el-form-item>
-        <el-form-item label="订单类型">
-          <el-select v-model="queryForm.type" placeholder="请选择订单类型" clearable>
-            <el-option label="全部" :value="0" />
-            <el-option label="课程订单" :value="1" />
-            <el-option label="活动订单" :value="2" />
-            <el-option label="VIP订单" :value="3" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="订单状态">
-          <el-select v-model="queryForm.status" placeholder="请选择订单状态" clearable>
-            <el-option label="全部" :value="-1" />
-            <el-option label="待支付" :value="0" />
-            <el-option label="已支付" :value="1" />
-            <el-option label="已退款" :value="2" />
-            <el-option label="已取消" :value="3" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="支付方式">
-          <el-select v-model="queryForm.paymentType" placeholder="请选择支付方式" clearable>
-            <el-option label="全部" :value="0" />
-            <el-option label="微信支付" :value="1" />
-            <el-option label="支付宝" :value="2" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="创建时间">
-          <el-date-picker
-            v-model="queryForm.dateRange"
-            type="daterange"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            value-format="YYYY-MM-DD"
+      <a-card class="search-card" :bordered="false">
+        <a-form :model="queryForm" layout="inline">
+          <a-form-item label="订单号">
+            <a-input v-model="queryForm.orderNo" placeholder="请输入订单号" allow-clear />
+          </a-form-item>
+          <a-form-item label="用户昵称">
+            <a-input v-model="queryForm.nickname" placeholder="请输入用户昵称" allow-clear />
+          </a-form-item>
+          <a-form-item label="订单类型">
+            <a-select v-model="queryForm.type" placeholder="请选择订单类型" allow-clear>
+              <a-option label="全部" :value="0" />
+              <a-option label="课程订单" :value="1" />
+              <a-option label="活动订单" :value="2" />
+              <a-option label="VIP订单" :value="3" />
+            </a-select>
+          </a-form-item>
+          <a-form-item label="订单状态">
+            <a-select v-model="queryForm.status" placeholder="请选择订单状态" allow-clear>
+              <a-option label="全部" :value="-1" />
+              <a-option label="待支付" :value="0" />
+              <a-option label="已支付" :value="1" />
+              <a-option label="已退款" :value="2" />
+              <a-option label="已取消" :value="3" />
+            </a-select>
+          </a-form-item>
+          <a-form-item label="支付方式">
+            <a-select v-model="queryForm.paymentType" placeholder="请选择支付方式" allow-clear>
+              <a-option label="全部" :value="0" />
+              <a-option label="微信支付" :value="1" />
+              <a-option label="支付宝" :value="2" />
+            </a-select>
+          </a-form-item>
+          <a-form-item label="创建时间">
+            <a-date-picker
+              v-model="queryForm.dateRange"
+              type="daterange"
+              :placeholder="['开始日期', '结束日期']"
+              format="YYYY-MM-DD"
+              value-format="YYYY-MM-DD"
+            />
+          </a-form-item>
+          <a-form-item>
+            <a-space>
+              <a-button type="primary" @click="handleSearch">搜索</a-button>
+              <a-button @click="handleReset">重置</a-button>
+            </a-space>
+          </a-form-item>
+        </a-form>
+      </a-card>
+
+      <a-card class="table-card" :bordered="false">
+        <a-table
+          :data="tableData"
+          :loading="loading"
+          :pagination="false"
+          row-key="id"
+        >
+          <template #columns>
+            <a-table-column title="订单号" data-index="id" :min-width="180" />
+            <a-table-column title="用户" data-index="username" :width="120" />
+            <a-table-column title="订单类型" :width="120" align="center">
+              <template #cell="{ record }">
+                <a-tag>
+                  {{ record.type === 1 ? '课程订单' : record.type === 2 ? '活动订单' : 'VIP订单' }}
+                </a-tag>
+              </template>
+            </a-table-column>
+            <a-table-column title="金额" :width="120" align="right">
+              <template #cell="{ record }">
+                ¥{{ record.amount.toFixed(2) }}
+              </template>
+            </a-table-column>
+            <a-table-column title="订单状态" :width="120" align="center">
+              <template #cell="{ record }">
+                <a-tag :color="getStatusColor(record.status)">
+                  {{ getStatusText(record.status) }}
+                </a-tag>
+              </template>
+            </a-table-column>
+            <a-table-column title="支付方式" :width="120" align="center">
+              <template #cell="{ record }">
+                <a-tag>
+                  {{ record.paymentType === 1 ? '微信支付' : '支付宝' }}
+                </a-tag>
+              </template>
+            </a-table-column>
+            <a-table-column title="创建时间" data-index="createTime" :width="160" />
+            <a-table-column title="支付时间" data-index="paymentTime" :width="160" />
+            <a-table-column title="操作" :width="200" align="center">
+              <template #cell="{ record }">
+                <a-space>
+                  <a-button type="primary" size="small" @click="viewDetail(record)">查看详情</a-button>
+                  <a-button v-if="record.status === 0" type="danger" size="small" @click="cancelOrder(record)">取消订单</a-button>
+                  <a-button v-if="record.status === 1" type="warning" size="small" @click="refundOrder(record)">退款</a-button>
+                </a-space>
+              </template>
+            </a-table-column>
+          </template>
+        </a-table>
+
+        <div class="pagination-wrapper">
+          <a-pagination
+            v-model:current="pagination.page"
+            v-model:page-size="pagination.size"
+            :total="pagination.total"
+            :show-total="true"
+            :show-jumper="true"
+            :show-page-size="true"
+            :page-size-options="[10, 20, 50, 100]"
+            @change="handleCurrentChange"
+            @page-size-change="handleSizeChange"
           />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
-
-      <el-table :data="tableData" style="width: 100%" border stripe>
-        <el-table-column prop="id" label="订单号" min-width="180" />
-        <el-table-column prop="username" label="用户" width="120" />
-        <el-table-column prop="type" label="订单类型" width="120" align="center">
-          <template #default="{ row }">
-            <el-tag v-if="row.type === 1">课程订单</el-tag>
-            <el-tag v-else-if="row.type === 2">活动订单</el-tag>
-            <el-tag v-else-if="row.type === 3">VIP订单</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="amount" label="金额" width="120" align="right">
-          <template #default="{ row }">
-            ¥{{ row.amount.toFixed(2) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="订单状态" width="120" align="center">
-          <template #default="{ row }">
-            <el-tag :type="getStatusType(row.status)">
-              {{ getStatusText(row.status) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="paymentType" label="支付方式" width="120" align="center">
-          <template #default="{ row }">
-            <el-tag v-if="row.paymentType === 1">微信支付</el-tag>
-            <el-tag v-else-if="row.paymentType === 2">支付宝</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="160" />
-        <el-table-column prop="paymentTime" label="支付时间" width="160" />
-        <el-table-column label="操作" width="200" align="center">
-          <template #default="{ row }">
-            <el-button type="primary" size="small" @click="viewDetail(row)">查看详情</el-button>
-            <el-button v-if="row.status === 0" type="danger" size="small" @click="cancelOrder(row)">取消订单</el-button>
-            <el-button v-if="row.status === 1" type="warning" size="small" @click="refundOrder(row)">退款</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-
-      <div class="pagination-wrapper">
-        <el-pagination
-          v-model:current-page="pagination.page"
-          v-model="pagination.page"
-          :page-size="pagination.size"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="pagination.total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
+        </div>
+      </a-card>
     </div>
   </div>
 </template>
@@ -108,7 +125,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { Message, Modal } from '@arco-design/web-vue'
 import { mockDataService } from '@/api/mock'
 
 const router = useRouter()
@@ -131,14 +148,14 @@ const pagination = reactive({
 
 const tableData = ref<any[]>([])
 
-function getStatusType(status: number): string {
-  const typeMap: Record<number, string> = {
-    0: 'warning',
-    1: 'success',
-    2: 'info',
-    3: 'danger'
+function getStatusColor(status: number): string {
+  const colorMap: Record<number, string> = {
+    0: 'orange',
+    1: 'green',
+    2: 'blue',
+    3: 'red'
   }
-  return typeMap[status] || 'info'
+  return colorMap[status] || 'blue'
 }
 
 function getStatusText(status: number): string {
@@ -163,7 +180,7 @@ async function fetchData() {
     tableData.value = result.list
     pagination.total = result.total
   } catch (error) {
-    ElMessage.error('获取数据失败')
+    Message.error('获取数据失败')
   } finally {
     loading.value = false
   }
@@ -201,25 +218,29 @@ function viewDetail(row: any) {
 }
 
 function cancelOrder(row: any) {
-  ElMessage.confirm('确定要取消该订单吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    row.status = 3
-    ElMessage.success('取消订单成功')
-  }).catch(() => {})
+  Modal.confirm({
+    title: '提示',
+    content: '确定要取消该订单吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      row.status = 3
+      Message.success('取消订单成功')
+    }
+  })
 }
 
 function refundOrder(row: any) {
-  ElMessage.confirm('确定要退款吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    row.status = 2
-    ElMessage.success('退款成功')
-  }).catch(() => {})
+  Modal.confirm({
+    title: '提示',
+    content: '确定要退款吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      row.status = 2
+      Message.success('退款成功')
+    }
+  })
 }
 
 onMounted(() => {
@@ -228,8 +249,18 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.search-form {
+.page-header {
   margin-bottom: 20px;
+}
+
+.search-card {
+  margin-bottom: 20px;
+}
+
+.table-card {
+  :deep(.arco-table-th) {
+    font-weight: 600;
+  }
 }
 
 .pagination-wrapper {

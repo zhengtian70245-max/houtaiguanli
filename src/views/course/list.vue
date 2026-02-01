@@ -1,102 +1,203 @@
 <template>
-  <div class="page-container">
-    <div class="page-header">
-      <h2>课程列表</h2>
-      <el-button type="primary" @click="handleAdd">添加课程</el-button>
-    </div>
-    <div class="page-content">
-      <el-form :inline="true" :model="queryForm" class="search-form">
-        <el-form-item label="课程标题">
-          <el-input v-model="queryForm.title" placeholder="请输入课程标题" clearable />
-        </el-form-item>
-        <el-form-item label="课程分类">
-          <el-select v-model="queryForm.category" placeholder="请选择课程分类" clearable>
-            <el-option label="全部" :value="0" />
-            <el-option label="专业课" :value="1" />
-            <el-option label="家长必修" :value="2" />
-            <el-option label="精品专题" :value="3" />
-            <el-option label="VIP专区" :value="4" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="queryForm.status" placeholder="请选择状态" clearable>
-            <el-option label="全部" :value="-1" />
-            <el-option label="上架" :value="1" />
-            <el-option label="下架" :value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
+  <div class="course-list-page">
+    <a-card class="search-card" :bordered="false">
+      <a-form :model="queryForm" layout="inline">
+        <a-form-item label="课程标题">
+          <a-input v-model="queryForm.title" placeholder="请输入课程标题" allow-clear style="width: 200px" />
+        </a-form-item>
+        <a-form-item label="课程分类">
+          <a-select v-model="queryForm.category" placeholder="请选择课程分类" allow-clear style="width: 150px">
+            <a-option :value="0">全部</a-option>
+            <a-option :value="1">专业课</a-option>
+            <a-option :value="2">家长必修</a-option>
+            <a-option :value="3">精品专题</a-option>
+            <a-option :value="4">VIP专区</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="状态">
+          <a-select v-model="queryForm.status" placeholder="请选择状态" allow-clear style="width: 120px">
+            <a-option :value="-1">全部</a-option>
+            <a-option :value="1">上架</a-option>
+            <a-option :value="0">下架</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item>
+          <a-space>
+            <a-button type="primary" @click="handleSearch">
+              <template #icon>
+                <icon-search />
+              </template>
+              搜索
+            </a-button>
+            <a-button @click="handleReset">
+              <template #icon>
+                <icon-refresh />
+              </template>
+              重置
+            </a-button>
+          </a-space>
+        </a-form-item>
+      </a-form>
+    </a-card>
 
-      <el-table :data="tableData" style="width: 100%" border stripe>
-        <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="title" label="课程标题" min-width="200">
-          <template #default="{ row }">
-            <router-link :to="`/course/detail/${row.id}`" class="course-title-link">
-              {{ row.title }}
-            </router-link>
-          </template>
-        </el-table-column>
-        <el-table-column prop="category" label="课程分类" width="120" align="center">
-          <template #default="{ row }">
-            <el-tag v-if="row.category === 1">专业课</el-tag>
-            <el-tag v-else-if="row.category === 2">家长必修</el-tag>
-            <el-tag v-else-if="row.category === 3">精品专题</el-tag>
-            <el-tag v-else-if="row.category === 4">VIP专区</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="price" label="价格" width="100" align="right">
-          <template #default="{ row }">
-            ¥{{ row.price.toFixed(2) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.status ? 'success' : 'danger'">
-              {{ row.status ? '上架' : '下架' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="viewCount" label="浏览量" width="100" align="right" />
-        <el-table-column prop="purchaseCount" label="购买量" width="100" align="right" />
-        <el-table-column prop="createTime" label="创建时间" width="160" />
-        <el-table-column label="操作" width="240" align="center">
-          <template #default="{ row }">
-            <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button type="info" size="small" @click="handleViewDetail(row)">详情</el-button>
-            <el-button v-if="row.status" type="warning" size="small" @click="handleTakeDown(row)">下架</el-button>
-            <el-button v-else type="success" size="small" @click="handlePutUp(row)">上架</el-button>
-            <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+    <a-card class="table-card" :bordered="false">
+      <template #title>
+        <div class="card-title">
+          <span>课程列表</span>
+          <a-button type="primary" @click="handleAdd">
+            <template #icon>
+              <icon-plus />
+            </template>
+            添加课程
+          </a-button>
+        </div>
+      </template>
+      <template #extra>
+        <a-space>
+          <a-button @click="handleBatchDelete" :disabled="selectedRows.length === 0">
+            <template #icon>
+              <icon-delete />
+            </template>
+            批量删除
+          </a-button>
+          <a-button @click="handleExport">
+            <template #icon>
+              <icon-download />
+            </template>
+            导出数据
+          </a-button>
+        </a-space>
+      </template>
+
+      <a-table
+        :data="tableData"
+        :loading="loading"
+        :pagination="false"
+        :row-selection="{
+          type: 'checkbox',
+          showCheckedAll: true
+        }"
+        @selection-change="handleSelectionChange"
+        row-key="id"
+      >
+        <template #columns>
+          <a-table-column title="ID" data-index="id" :width="80" align="center" />
+          <a-table-column title="课程标题" data-index="title" :width="200">
+            <template #cell="{ record }">
+              <a-button type="text" @click="handleViewDetail(record)">{{ record.title }}</a-button>
+            </template>
+          </a-table-column>
+          <a-table-column title="课程分类" data-index="category" :width="120" align="center">
+            <template #cell="{ record }">
+              <a-tag v-if="record.category === 1" color="blue">专业课</a-tag>
+              <a-tag v-else-if="record.category === 2" color="green">家长必修</a-tag>
+              <a-tag v-else-if="record.category === 3" color="orange">精品专题</a-tag>
+              <a-tag v-else-if="record.category === 4" color="purple">VIP专区</a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="价格" data-index="price" :width="100" align="right">
+            <template #cell="{ record }">
+              <span class="price-text">¥{{ record.price.toFixed(2) }}</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="状态" data-index="status" :width="100" align="center">
+            <template #cell="{ record }">
+              <a-tag :color="record.status ? 'green' : 'red'">
+                {{ record.status ? '上架' : '下架' }}
+              </a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="浏览量" data-index="viewCount" :width="100" align="right" />
+          <a-table-column title="购买量" data-index="purchaseCount" :width="100" align="right" />
+          <a-table-column title="创建时间" data-index="createTime" :width="160" />
+          <a-table-column title="操作" :width="280" align="center" fixed="right">
+            <template #cell="{ record }">
+              <a-space :size="4">
+                <a-button type="text" size="small" @click="handleEdit(record)">
+                  <template #icon>
+                    <icon-edit />
+                  </template>
+                  编辑
+                </a-button>
+                <a-button type="text" size="small" @click="handleViewDetail(record)">
+                  <template #icon>
+                    <icon-eye />
+                  </template>
+                  详情
+                </a-button>
+                <a-button
+                  v-if="record.status"
+                  type="text"
+                  size="small"
+                  @click="handleTakeDown(record)"
+                >
+                  <template #icon>
+                    <icon-stop />
+                  </template>
+                  下架
+                </a-button>
+                <a-button
+                  v-else
+                  type="text"
+                  size="small"
+                  @click="handlePutUp(record)"
+                >
+                  <template #icon>
+                    <icon-play-circle />
+                  </template>
+                  上架
+                </a-button>
+                <a-popconfirm content="确定要删除该课程吗？" @ok="handleDelete(record)">
+                  <a-button type="text" size="small" status="danger">
+                    <template #icon>
+                      <icon-delete />
+                    </template>
+                    删除
+                  </a-button>
+                </a-popconfirm>
+              </a-space>
+            </template>
+          </a-table-column>
+        </template>
+      </a-table>
 
       <div class="pagination-wrapper">
-        <el-pagination
-          v-model:current-page="pagination.page"
+        <a-pagination
+          v-model:current="pagination.page"
           v-model:page-size="pagination.size"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
           :total="pagination.total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+          :show-total="true"
+          :show-jumper="true"
+          :show-page-size="true"
+          :page-size-options="[10, 20, 50, 100]"
+          @change="handlePageChange"
+          @page-size-change="handleSizeChange"
         />
       </div>
-    </div>
+    </a-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
-import { useRouter, RouterLink } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { useRouter } from 'vue-router'
+import { Message, Modal } from '@arco-design/web-vue'
+import {
+  IconSearch,
+  IconRefresh,
+  IconPlus,
+  IconDelete,
+  IconDownload,
+  IconEdit,
+  IconEye,
+  IconStop,
+  IconPlayCircle
+} from '@arco-design/web-vue/es/icon'
 import { mockDataService } from '@/api/mock'
 
 const router = useRouter()
 const loading = ref(false)
+const selectedRows = ref<any[]>([])
 
 const queryForm = reactive({
   title: '',
@@ -124,7 +225,7 @@ async function fetchData() {
     tableData.value = result.list
     pagination.total = result.total
   } catch (error) {
-    ElMessage.error('获取数据失败')
+    Message.error('获取数据失败')
   } finally {
     loading.value = false
   }
@@ -143,14 +244,14 @@ function handleReset() {
   fetchData()
 }
 
-function handleSizeChange(size: number) {
-  pagination.size = size
-  pagination.page = 1
+function handlePageChange(page: number) {
+  pagination.page = page
   fetchData()
 }
 
-function handleCurrentChange(page: number) {
-  pagination.page = page
+function handleSizeChange(size: number) {
+  pagination.size = size
+  pagination.page = 1
   fetchData()
 }
 
@@ -159,46 +260,67 @@ function handleAdd() {
 }
 
 function handleEdit(row: any) {
-  router.push(`/course/detail/${row.id}?tab=chapters`)
+  router.push(`/course/detail/1?tab=chapters`)
 }
 
 function handleViewDetail(row: any) {
-  console.log('handleViewDetail called with row:', row)
-  console.log('Navigating to:', `/course/detail/${row.id}`)
-  router.push(`/course/detail/${row.id}`)
+  console.log('View detail clicked:', row)
+  console.log('Navigating to:', `/course/detail/1`)
+  router.push(`/course/detail/1`)
+  console.log('Navigation executed')
 }
 
 function handleTakeDown(row: any) {
-  ElMessageBox.confirm('确定要下架该课程吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    row.status = 0
-    ElMessage.success('下架成功')
-  }).catch(() => {})
+  Modal.confirm({
+    title: '提示',
+    content: '确定要下架该课程吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      row.status = 0
+      Message.success('下架成功')
+    }
+  })
 }
 
 function handlePutUp(row: any) {
-  ElMessageBox.confirm('确定要上架该课程吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    row.status = 1
-    ElMessage.success('上架成功')
-  }).catch(() => {})
+  Modal.confirm({
+    title: '提示',
+    content: '确定要上架该课程吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      row.status = 1
+      Message.success('上架成功')
+    }
+  })
 }
 
 function handleDelete(row: any) {
-  ElMessageBox.confirm('确定要删除该课程吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    ElMessage.success('删除成功')
-    fetchData()
-  }).catch(() => {})
+  Message.success('删除成功')
+  fetchData()
+}
+
+function handleSelectionChange(keys: any[], rows: any[]) {
+  selectedRows.value = rows
+}
+
+function handleBatchDelete() {
+  Modal.confirm({
+    title: '提示',
+    content: `确定要删除选中的 ${selectedRows.value.length} 个课程吗？`,
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      Message.success('批量删除成功')
+      selectedRows.value = []
+      fetchData()
+    }
+  })
+}
+
+function handleExport() {
+  Message.info('导出功能开发中')
 }
 
 onMounted(() => {
@@ -207,39 +329,29 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.search-form {
-  margin-bottom: 20px;
-}
-
-.pagination-wrapper {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.course-title-button {
-  color: #409eff;
-  text-decoration: underline;
-  padding: 0;
-  margin: 0;
-  height: auto;
-  line-height: 1;
-  
-  &:hover {
-    color: #66b1ff;
-    background: transparent;
+.course-list-page {
+  .search-card {
+    margin-bottom: 16px;
   }
-  
-  &:active {
-    color: #3a8ee6;
-    background: transparent;
+
+  .table-card {
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .price-text {
+      color: var(--arco-danger-color-6);
+      font-weight: 600;
+    }
+  }
+
+  .pagination-wrapper {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
   }
 }
 </style>

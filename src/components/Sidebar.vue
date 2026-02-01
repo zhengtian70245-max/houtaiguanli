@@ -1,247 +1,372 @@
 <template>
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h2>zhengtian 管理后台</h2>
-    </div>
-    <div class="sidebar-content">
-      <el-menu
-        :default-active="$route.path"
-        :collapse="isCollapse"
-        :collapse-transition="false"
-        router
-        background-color="#001529"
-        text-color="#fff"
-        active-text-color="#ffd04b"
-      >
-        <el-sub-menu index="/course">
-          <template #title>
-            <el-icon>
-              <Reading />
-            </el-icon>
-            <span>课程管理</span>
-          </template>
-          <el-menu-item index="/course/list">
-            <el-icon><Document /></el-icon>
-            <span>课程列表</span>
-          </el-menu-item>
-          <el-menu-item index="/course/category">
-            <el-icon><Folder /></el-icon>
-            <span>课程分类</span>
-          </el-menu-item>
-          <el-menu-item index="/course/material">
-            <el-icon><VideoCameraFilled /></el-icon>
-            <span>素材库</span>
-          </el-menu-item>
-        </el-sub-menu>
+  <a-menu
+    :open-keys="openKeys"
+    :inline-collapsed="props.isCollapse"
+    mode="inline"
+    @open-change="handleOpenChange"
+  >
+    <a-menu-item key="/dashboard" @click="navigateTo('/dashboard')">
+      <template #icon>
+        <icon-file />
+      </template>
+      <span>仪表盘</span>
+    </a-menu-item>
 
-        <el-sub-menu index="/column">
-          <template #title>
-            <el-icon>
-              <CollectionTag />
-            </el-icon>
-            <span>专栏管理</span>
-          </template>
-          <el-menu-item index="/column/list">
-            <el-icon><List /></el-icon>
-            <span>专栏列表</span>
-          </el-menu-item>
-          <el-menu-item index="/column/category">
-            <el-icon><Tickets /></el-icon>
-            <span>专栏分类</span>
-          </el-menu-item>
-        </el-sub-menu>
+    <a-sub-menu key="/course">
+      <template #icon>
+        <icon-file />
+      </template>
+      <template #title>课程管理</template>
+      <a-menu-item key="/course/list" @click="navigateTo('/course/list')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>课程列表</span>
+      </a-menu-item>
+      <a-menu-item key="/course/category" @click="navigateTo('/course/category')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>课程分类</span>
+      </a-menu-item>
+      <a-menu-item key="/course/material" @click="navigateTo('/course/material')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>素材库</span>
+      </a-menu-item>
+    </a-sub-menu>
 
-        <el-sub-menu index="/activity">
-          <template #title>
-            <el-icon>
-              <Calendar />
-            </el-icon>
-            <span>活动管理</span>
-          </template>
-          <el-menu-item index="/activity/list">活动列表</el-menu-item>
-          <el-menu-item index="/activity/register">报名管理</el-menu-item>
-        </el-sub-menu>
+    <a-sub-menu key="/column">
+      <template #icon>
+        <icon-file />
+      </template>
+      <template #title>专栏管理</template>
+      <a-menu-item key="/column/list" @click="navigateTo('/column/list')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>专栏列表</span>
+      </a-menu-item>
+      <a-menu-item key="/column/category" @click="navigateTo('/column/category')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>专栏分类</span>
+      </a-menu-item>
+    </a-sub-menu>
 
-        <el-sub-menu index="/order">
-          <template #title>
-            <el-icon>
-              <PriceTag />
-            </el-icon>
-            <span>订单管理</span>
-          </template>
-          <el-menu-item index="/order/list">订单列表</el-menu-item>
-          <el-menu-item index="/order/refund">退款管理</el-menu-item>
-        </el-sub-menu>
+    <a-sub-menu key="/activity">
+      <template #icon>
+        <icon-file />
+      </template>
+      <template #title>活动管理</template>
+      <a-menu-item key="/activity/list" @click="navigateTo('/activity/list')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>活动列表</span>
+      </a-menu-item>
+      <a-menu-item key="/activity/register" @click="navigateTo('/activity/register')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>报名管理</span>
+      </a-menu-item>
+    </a-sub-menu>
 
-        <el-sub-menu index="/vip">
-          <template #title>
-            <el-icon>
-              <Present />
-            </el-icon>
-            <span>VIP会员管理</span>
-          </template>
-          <el-menu-item index="/vip/list">VIP列表</el-menu-item>
-        </el-sub-menu>
+    <a-sub-menu key="/order">
+      <template #icon>
+        <icon-file />
+      </template>
+      <template #title>订单管理</template>
+      <a-menu-item key="/order/list" @click="navigateTo('/order/list')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>订单列表</span>
+      </a-menu-item>
+      <a-menu-item key="/order/refund" @click="navigateTo('/order/refund')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>退款管理</span>
+      </a-menu-item>
+    </a-sub-menu>
 
-        <el-sub-menu index="/distributor">
-          <template #title>
-            <el-icon>
-              <Share />
-            </el-icon>
-            <span>分销管理</span>
-          </template>
-          <el-menu-item index="/distributor/list">分销商列表</el-menu-item>
-          <el-menu-item index="/distributor/withdraw">提现管理</el-menu-item>
-        </el-sub-menu>
+    <a-sub-menu key="/vip">
+      <template #icon>
+        <icon-file />
+      </template>
+      <template #title>VIP会员管理</template>
+      <a-menu-item key="/vip/list" @click="navigateTo('/vip/list')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>VIP列表</span>
+      </a-menu-item>
+      <a-menu-item key="/vip/config" @click="navigateTo('/vip/config')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>VIP配置</span>
+      </a-menu-item>
+    </a-sub-menu>
 
-        <el-sub-menu index="/statistics">
-          <template #title>
-            <el-icon>
-              <DataAnalysis />
-            </el-icon>
-            <span>财务统计</span>
-          </template>
-          <el-menu-item index="/statistics/sales">销售统计</el-menu-item>
-          <el-menu-item index="/statistics/course">课程收入统计</el-menu-item>
-          <el-menu-item index="/statistics/activity">活动收入统计</el-menu-item>
-          <el-menu-item index="/statistics/vip">VIP收入统计</el-menu-item>
-          <el-menu-item index="/statistics/distributor">分销佣金统计</el-menu-item>
-        </el-sub-menu>
+    <a-sub-menu key="/distributor">
+      <template #icon>
+        <icon-file />
+      </template>
+      <template #title>分销管理</template>
+      <a-menu-item key="/distributor/list" @click="navigateTo('/distributor/list')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>分销商列表</span>
+      </a-menu-item>
+      <a-menu-item key="/distributor/withdraw" @click="navigateTo('/distributor/withdraw')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>提现管理</span>
+      </a-menu-item>
+      <a-menu-item key="/distributor/config" @click="navigateTo('/distributor/config')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>分销配置</span>
+      </a-menu-item>
+    </a-sub-menu>
 
-        <el-sub-menu index="/statistics">
-          <template #title>
-            <el-icon>
-              <DataAnalysis />
-            </el-icon>
-            <span>运营统计</span>
-          </template>
-          <el-menu-item index="/statistics/user">用户统计</el-menu-item>
-          <el-menu-item index="/statistics/distributor">分销商统计</el-menu-item>
-          <el-menu-item index="/statistics/course">课程学习统计</el-menu-item>
-          <el-menu-item index="/statistics/activity">活动参与统计</el-menu-item>
-        </el-sub-menu>
+    <a-sub-menu key="/statistics">
+      <template #icon>
+        <icon-file />
+      </template>
+      <template #title>数据统计</template>
+      <a-menu-item key="/statistics/dashboard" @click="navigateTo('/statistics/dashboard')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>数据概览</span>
+      </a-menu-item>
+      <a-menu-item key="/statistics/sales" @click="navigateTo('/statistics/sales')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>销售统计</span>
+      </a-menu-item>
+      <a-menu-item key="/statistics/course" @click="navigateTo('/statistics/course')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>课程统计</span>
+      </a-menu-item>
+      <a-menu-item key="/statistics/activity" @click="navigateTo('/statistics/activity')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>活动统计</span>
+      </a-menu-item>
+      <a-menu-item key="/statistics/vip" @click="navigateTo('/statistics/vip')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>VIP统计</span>
+      </a-menu-item>
+      <a-menu-item key="/statistics/distributor" @click="navigateTo('/statistics/distributor')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>分销统计</span>
+      </a-menu-item>
+      <a-menu-item key="/statistics/user" @click="navigateTo('/statistics/user')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>用户统计</span>
+      </a-menu-item>
+    </a-sub-menu>
 
-        <el-sub-menu index="/system">
-          <template #title>
-            <el-icon>
-              <Setting />
-            </el-icon>
-            <span>系统配置</span>
-          </template>
-          <el-menu-item index="/system/base-config">基础配置</el-menu-item>
-          <el-menu-item index="/system/vip-config">VIP配置</el-menu-item>
-          <el-menu-item index="/system/distributor-config">分销配置</el-menu-item>
-          <el-menu-item index="/system/sms-config">短信配置</el-menu-item>
-          <el-menu-item index="/system/payment-config">支付配置</el-menu-item>
-        </el-sub-menu>
+    <a-sub-menu key="/system">
+      <template #icon>
+        <icon-file />
+      </template>
+      <template #title>系统配置</template>
+      <a-menu-item key="/system/base-config" @click="navigateTo('/system/base-config')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>基础配置</span>
+      </a-menu-item>
+      <a-menu-item key="/system/vip-config" @click="navigateTo('/system/vip-config')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>VIP配置</span>
+      </a-menu-item>
+      <a-menu-item key="/system/distributor-config" @click="navigateTo('/system/distributor-config')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>分销配置</span>
+      </a-menu-item>
+      <a-menu-item key="/system/sms-config" @click="navigateTo('/system/sms-config')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>短信配置</span>
+      </a-menu-item>
+      <a-menu-item key="/system/payment-config" @click="navigateTo('/system/payment-config')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>支付配置</span>
+      </a-menu-item>
+    </a-sub-menu>
 
-        <el-sub-menu index="/user">
-          <template #title>
-            <el-icon>
-              <User />
-            </el-icon>
-            <span>用户管理</span>
-          </template>
-          <el-menu-item index="/user/list">用户列表</el-menu-item>
-        </el-sub-menu>
-      </el-menu>
-    </div>
-    <div class="sidebar-footer">
-      <el-button
-        :icon="isCollapse ? 'Expand' : 'Fold'"
-        circle
-        @click="toggleCollapse"
-      />
-    </div>
-  </div>
+    <a-sub-menu key="/user">
+      <template #icon>
+        <icon-file />
+      </template>
+      <template #title>用户管理</template>
+      <a-menu-item key="/user/list" @click="navigateTo('/user/list')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>用户列表</span>
+      </a-menu-item>
+      <a-menu-item key="/user/tree" @click="navigateTo('/user/tree')">
+        <template #icon>
+          <icon-file />
+        </template>
+        <span>用户关系</span>
+      </a-menu-item>
+    </a-sub-menu>
+  </a-menu>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, defineProps } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import {
-  Setting,
-  User,
-  Reading,
-  Calendar,
-  PriceTag,
-  Present,
-  Share,
-  DataAnalysis,
-  VideoCameraFilled,
-  Document,
-  Folder
-} from '@element-plus/icons-vue'
+  IconFile
+} from '@arco-design/web-vue/es/icon'
+
+const props = defineProps<{
+  isCollapse?: boolean
+}>()
 
 const router = useRouter()
-const isCollapse = ref(false)
+const route = useRoute()
+const openKeys = ref<string[]>([])
 
-function toggleCollapse() {
-  isCollapse.value = !isCollapse.value
+const currentPath = computed(() => route.path)
+
+function navigateTo(path: string) {
+  console.log('Navigating to:', path)
+  router.push(path)
 }
+
+function handleSelect(info: any) {
+  console.log('Menu select event:', info)
+  // 尝试不同的方式获取key值
+  const key = info.key || info
+  console.log('Navigating to:', key)
+  router.push(key)
+}
+
+function handleOpenChange(keys: string[]) {
+  openKeys.value = keys
+}
+
+
 </script>
 
 <style scoped lang="scss">
-.sidebar {
-  width: 220px;
-  height: 100vh;
-  background: #001529;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  transition: width 0.3s ease;
+:deep(.arco-menu) {
+  background: transparent;
+  border: none;
 
-  &.collapse {
-    width: 60px;
-  }
+  .arco-menu-item,
+  .arco-menu-inline-header {
+    margin-bottom: 4px;
+    border-radius: var(--arco-radius-medium);
+    transition: all 0.3s ease;
+    color: var(--arco-text-color-2);
 
-  .sidebar-header {
-    padding: 20px;
-    text-align: center;
+    &:hover {
+      background: var(--arco-fill-color-1);
+      color: var(--arco-primary-color-7);
+    }
 
-    h2 {
-      font-size: 18px;
-      color: #fff;
-      margin: 0;
+    .arco-icon {
+      color: var(--arco-text-color-3);
+      transition: all 0.3s ease;
+    }
+
+    &:hover .arco-icon {
+      color: var(--arco-primary-color-7);
     }
   }
 
-  .sidebar-content {
-    flex: 1;
-    overflow-y: auto;
+  .arco-menu-item-selected {
+    background: linear-gradient(135deg, var(--arco-primary-color-1) 0%, var(--arco-primary-color-2) 100%);
+    color: var(--arco-primary-color-7);
+    font-weight: 500;
 
-    .el-menu {
-      background: #001529;
+    .arco-icon {
+      color: var(--arco-primary-color-7);
+    }
 
-      .el-sub-menu {
-        .el-icon {
-          color: #fff;
-        }
-      }
-
-      .el-menu-item {
-        .el-icon {
-          color: #fff;
-        }
-
-        &.is-active {
-          background: #1890ff;
-          color: #ffd04b;
-        }
-      }
+    &::before {
+      background: var(--arco-primary-color-7);
     }
   }
 
-  .sidebar-footer {
-    padding: 10px;
-    text-align: center;
+  .arco-menu-inline-content {
+    padding-left: 16px;
+  }
 
-    .el-button {
-      background: #1890ff;
-      border: none;
+  .arco-menu-item {
+    padding: 10px 16px;
 
-      &:hover {
-        background: #40a9ff;
+    .arco-icon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+  }
+
+  .arco-menu-inline-header {
+    padding: 12px 16px;
+
+    .arco-icon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .arco-menu-icon-suffix {
+      transition: transform 0.3s ease;
+    }
+  }
+
+  .arco-menu-inline-header.arco-menu-opened {
+    .arco-menu-icon-suffix {
+      transform: rotate(90deg);
+    }
+  }
+
+  &.arco-menu-collapsed {
+    .arco-menu-item,
+    .arco-menu-inline-header {
+      padding: 12px;
+      justify-content: center;
+
+      .arco-icon {
+        margin-right: 0;
+      }
+
+      .arco-menu-title {
+        display: none;
       }
     }
   }

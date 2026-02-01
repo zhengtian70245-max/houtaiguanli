@@ -1,231 +1,231 @@
 <template>
-  <div class="column-list">
-    <!-- 搜索筛选区 -->
-    <div class="search-filter">
-      <el-form :inline="true" :model="searchForm" class="search-form">
-        <el-form-item label="专栏名称">
-          <el-input v-model="searchForm.name" placeholder="请输入专栏名称" clearable />
-        </el-form-item>
-        <el-form-item label="专栏分组">
-          <el-select v-model="searchForm.category" placeholder="请选择专栏分组" clearable>
-            <el-option label="请选择分组" :value="''" />
-            <el-option label="默认分组" :value="1" />
-            <el-option label="热门专栏" :value="2" />
-            <el-option label="推荐专栏" :value="3" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="上架状态">
-          <el-select v-model="searchForm.status" placeholder="请选择上架状态" clearable>
-            <el-option label="请选择状态" :value="''" />
-            <el-option label="已上架" :value="1" />
-            <el-option label="已下架" :value="2" />
-            <el-option label="草稿" :value="3" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="购买方式">
-          <el-select v-model="searchForm.purchaseType" placeholder="请选择购买方式" clearable>
-            <el-option label="请选择购买方式" :value="''" />
-            <el-option label="单独购买" :value="1" />
-            <el-option label="订阅" :value="2" />
-            <el-option label="加盟" :value="3" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="素材状态">
-          <el-select v-model="searchForm.materialStatus" placeholder="请选择素材状态" clearable>
-            <el-option label="请选择素材状态" :value="''" />
-            <el-option label="已审核" :value="1" />
-            <el-option label="未审核" :value="2" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="账号搜索">
-          <el-input v-model="searchForm.account" placeholder="输入账号" clearable />
-        </el-form-item>
-        <el-form-item label="创建时间">
-          <el-date-picker
-            v-model="searchForm.createTime"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            clearable
-          />
-        </el-form-item>
-        <el-form-item label="价格区间">
-          <el-input-number v-model="searchForm.priceMin" placeholder="最低" clearable />
-          <span style="margin: 0 8px;">-</span>
-          <el-input-number v-model="searchForm.priceMax" placeholder="最高" clearable />
-        </el-form-item>
-        <el-form-item label="VIP折扣">
-          <el-input-number v-model="searchForm.vipDiscountMin" placeholder="最低" clearable />
-          <span style="margin: 0 8px;">-</span>
-          <el-input-number v-model="searchForm.vipDiscountMax" placeholder="最高" clearable />
-        </el-form-item>
-        <el-form-item label="SVIP折扣">
-          <el-input-number v-model="searchForm.svipDiscountMin" placeholder="最低" clearable />
-          <span style="margin: 0 8px;">-</span>
-          <el-input-number v-model="searchForm.svipDiscountMax" placeholder="最高" clearable />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="handleReset">重置</el-button>
-          <el-button @click="handleMoreOptions">更多筛选</el-button>
-        </el-form-item>
-      </el-form>
-    </div>
-
-    <!-- 操作按钮区 -->
-    <div class="action-buttons">
-      <el-button type="primary" @click="handleAddColumn">
-        <el-icon><Plus /></el-icon>
-        新增专栏
-      </el-button>
-      <el-button @click="handleShareFunction">
-        <el-icon><Share /></el-icon>
-        分享功能
-      </el-button>
-      <el-button @click="handleSortByOrder">
-        <el-icon><Top /></el-icon>
-        序号排序
-      </el-button>
-      <el-dropdown>
-        <el-button>
-          更多操作 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-        </el-button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="handleBatchPublish">批量上架</el-dropdown-item>
-            <el-dropdown-item @click="handleBatchUnpublish">批量下架</el-dropdown-item>
-            <el-dropdown-item @click="handleBatchDelete">批量删除</el-dropdown-item>
-            <el-dropdown-item @click="handleUpdateCreationCount">更新创作量</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-    </div>
-
-    <!-- 数据列表区 -->
-    <div class="data-list">
-      <el-table
-        v-loading="loading"
-        :data="columnsData"
-        style="width: 100%"
-        border
-        stripe
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column type="selection" width="55" />
-        <el-table-column label="专栏封面" width="100" align="center">
-          <template #default="{ row }">
-            <div class="column-cover">
-              <img :src="row.cover" alt="专栏封面" v-if="row.cover" />
-              <div class="cover-placeholder" v-else>
-                <el-icon><PictureFilled /></el-icon>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label="专栏名称" min-width="200">
-          <template #default="{ row }">
-            <div class="column-info">
-              <div class="column-name">{{ row.name }}</div>
-              <div class="column-price">
-                <span class="price current">{{ row.price }}</span>
-                <span class="price original" v-if="row.originalPrice">{{ row.originalPrice }}</span>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column prop="categoryName" label="分组" width="120" align="center" />
-        <el-table-column label="状态" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : row.status === 2 ? 'danger' : 'warning'">
-              {{ row.status === 1 ? '已上架' : row.status === 2 ? '已下架' : '草稿' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="courseCount" label="课程数" width="80" align="center" />
-        <el-table-column prop="createTime" label="创建时间" width="180" align="center" />
-        <el-table-column prop="order" label="序号" width="80" align="center" />
-        <el-table-column prop="createAccount" label="创建账号" width="150" align="center" />
-        <el-table-column label="操作" width="200" align="center">
-          <template #default="{ row }">
-            <el-button size="small" @click="handleViewDetail(row)">
-              <el-icon><View /></el-icon>
-              详情
-            </el-button>
-            <el-button size="small" @click="handleEdit(row)">
-              <el-icon><Edit /></el-icon>
-              编辑
-            </el-button>
-            <el-button size="small" @click="handleShare(row)">
-              <el-icon><Share /></el-icon>
-              分享
-            </el-button>
-            <el-dropdown>
-              <el-button size="small">
-                更多 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="handlePublish(row)" v-if="row.status !== 1">上架</el-dropdown-item>
-                  <el-dropdown-item @click="handleUnpublish(row)" v-if="row.status === 1">下架</el-dropdown-item>
-                  <el-dropdown-item @click="handleDelete(row)">删除</el-dropdown-item>
-                </el-dropdown-menu>
+  <div class="column-list-page">
+    <a-card class="search-card" :bordered="false">
+      <a-form :model="searchForm" layout="inline">
+        <a-form-item label="专栏名称">
+          <a-input v-model="searchForm.name" placeholder="请输入专栏名称" allow-clear style="width: 200px" />
+        </a-form-item>
+        <a-form-item label="专栏分组">
+          <a-select v-model="searchForm.category" placeholder="请选择专栏分组" allow-clear style="width: 150px">
+            <a-option value="">请选择分组</a-option>
+            <a-option :value="1">默认分组</a-option>
+            <a-option :value="2">热门专栏</a-option>
+            <a-option :value="3">推荐专栏</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="上架状态">
+          <a-select v-model="searchForm.status" placeholder="请选择上架状态" allow-clear style="width: 120px">
+            <a-option value="">请选择状态</a-option>
+            <a-option :value="1">已上架</a-option>
+            <a-option :value="2">已下架</a-option>
+            <a-option :value="3">草稿</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="购买方式">
+          <a-select v-model="searchForm.purchaseType" placeholder="请选择购买方式" allow-clear style="width: 120px">
+            <a-option value="">请选择购买方式</a-option>
+            <a-option :value="1">单独购买</a-option>
+            <a-option :value="2">订阅</a-option>
+            <a-option :value="3">加盟</a-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item>
+          <a-space>
+            <a-button type="primary" @click="handleSearch">
+              <template #icon>
+                <icon-search />
               </template>
-            </el-dropdown>
-          </template>
-        </el-table-column>
-      </el-table>
+              搜索
+            </a-button>
+            <a-button @click="handleReset">
+              <template #icon>
+                <icon-refresh />
+              </template>
+              重置
+            </a-button>
+          </a-space>
+        </a-form-item>
+      </a-form>
+    </a-card>
 
-      <!-- 分页 -->
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="pagination.page"
+    <a-card class="table-card" :bordered="false">
+      <template #title>
+        <div class="card-title">
+          <span>专栏列表</span>
+          <a-button type="primary" @click="handleAddColumn">
+            <template #icon>
+              <icon-plus />
+            </template>
+            新增专栏
+          </a-button>
+        </div>
+      </template>
+      <template #extra>
+        <a-space>
+          <a-button @click="handleShareFunction">
+            <template #icon>
+              <icon-share-alt />
+            </template>
+            分享功能
+          </a-button>
+          <a-button @click="handleSortByOrder">
+            <template #icon>
+              <icon-sort />
+            </template>
+            序号排序
+          </a-button>
+          <a-dropdown>
+            <a-button>
+              更多操作
+              <template #icon>
+                <icon-down />
+              </template>
+            </a-button>
+            <template #content>
+              <a-doption @click="handleBatchPublish">批量上架</a-doption>
+              <a-doption @click="handleBatchUnpublish">批量下架</a-doption>
+              <a-doption @click="handleBatchDelete">批量删除</a-doption>
+              <a-doption @click="handleUpdateCreationCount">更新创作量</a-doption>
+            </template>
+          </a-dropdown>
+        </a-space>
+      </template>
+
+      <a-table
+        :data="columnsData"
+        :loading="loading"
+        :pagination="false"
+        :row-selection="{
+          type: 'checkbox',
+          showCheckedAll: true
+        }"
+        @selection-change="handleSelectionChange"
+        row-key="id"
+      >
+        <template #columns>
+          <a-table-column title="专栏封面" :width="100" align="center">
+            <template #cell="{ record }">
+              <div class="column-cover">
+                <img :src="record.cover" alt="专栏封面" v-if="record.cover" />
+                <div class="cover-placeholder" v-else>
+                  <icon-image />
+                </div>
+              </div>
+            </template>
+          </a-table-column>
+          <a-table-column title="专栏名称" :width="200">
+            <template #cell="{ record }">
+              <div class="column-info">
+                <div class="column-name">{{ record.name }}</div>
+                <div class="column-price">
+                  <span class="price current">{{ record.price }}</span>
+                  <span class="price original" v-if="record.originalPrice">{{ record.originalPrice }}</span>
+                </div>
+              </div>
+            </template>
+          </a-table-column>
+          <a-table-column title="分组" data-index="categoryName" :width="120" align="center" />
+          <a-table-column title="状态" data-index="status" :width="100" align="center">
+            <template #cell="{ record }">
+              <a-tag :color="record.status === 1 ? 'green' : record.status === 2 ? 'red' : 'orange'">
+                {{ record.status === 1 ? '已上架' : record.status === 2 ? '已下架' : '草稿' }}
+              </a-tag>
+            </template>
+          </a-table-column>
+          <a-table-column title="课程数" data-index="courseCount" :width="80" align="center" />
+          <a-table-column title="创建时间" data-index="createTime" :width="180" align="center" />
+          <a-table-column title="序号" data-index="order" :width="80" align="center" />
+          <a-table-column title="创建账号" data-index="createAccount" :width="150" align="center" />
+          <a-table-column title="操作" :width="200" align="center" fixed="right">
+            <template #cell="{ record }">
+              <a-space :size="4">
+                <a-button type="text" size="small" @click="handleViewDetail(record)">
+                  <template #icon>
+                    <icon-eye />
+                  </template>
+                  详情
+                </a-button>
+                <a-button type="text" size="small" @click="handleEdit(record)">
+                  <template #icon>
+                    <icon-edit />
+                  </template>
+                  编辑
+                </a-button>
+                <a-button type="text" size="small" @click="handleShare(record)">
+                  <template #icon>
+                    <icon-share-alt />
+                  </template>
+                  分享
+                </a-button>
+                <a-dropdown>
+                  <a-button type="text" size="small">
+                    更多
+                    <template #icon>
+                      <icon-down />
+                    </template>
+                  </a-button>
+                  <template #content>
+                    <a-doption v-if="record.status !== 1" @click="handlePublish(record)">上架</a-doption>
+                    <a-doption v-if="record.status === 1" @click="handleUnpublish(record)">下架</a-doption>
+                    <a-doption @click="handleDelete(record)">删除</a-doption>
+                  </template>
+                </a-dropdown>
+              </a-space>
+            </template>
+          </a-table-column>
+        </template>
+      </a-table>
+
+      <div class="pagination-wrapper">
+        <a-pagination
+          v-model:current="pagination.page"
           v-model:page-size="pagination.size"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
           :total="pagination.total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+          :show-total="true"
+          :show-jumper="true"
+          :show-page-size="true"
+          :page-size-options="[10, 20, 50, 100]"
+          @change="handlePageChange"
+          @page-size-change="handleSizeChange"
         />
       </div>
-    </div>
+    </a-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { Message } from '@arco-design/web-vue'
+import {
+  IconSearch,
+  IconRefresh,
+  IconPlus,
+  IconShareAlt,
+  IconSort,
+  IconDown,
+  IconImage,
+  IconEye,
+  IconEdit
+} from '@arco-design/web-vue/es/icon'
 
 const router = useRouter()
 const loading = ref(false)
-const selectedRows = ref([])
+const selectedRows = ref<any[]>([])
 
-// 搜索表单
 const searchForm = reactive({
   name: '',
   category: '',
   status: '',
-  purchaseType: '',
-  materialStatus: '',
-  account: '',
-  createTime: [],
-  priceMin: '',
-  priceMax: '',
-  vipDiscountMin: '',
-  vipDiscountMax: '',
-  svipDiscountMin: '',
-  svipDiscountMax: ''
+  purchaseType: ''
 })
 
-// 分页
 const pagination = reactive({
   page: 1,
   size: 10,
   total: 0
 })
 
-// 专栏数据
 const columnsData = ref([
   {
     id: 1,
@@ -294,146 +294,115 @@ const columnsData = ref([
   }
 ])
 
-// 初始化
 onMounted(() => {
   pagination.total = columnsData.value.length
 })
 
-// 搜索
-const handleSearch = () => {
+function handleSearch() {
   loading.value = true
-  // 模拟搜索
   setTimeout(() => {
     loading.value = false
-    ElMessage.success('搜索成功')
+    Message.success('搜索成功')
   }, 500)
 }
 
-// 重置
-const handleReset = () => {
+function handleReset() {
   Object.keys(searchForm).forEach(key => {
     searchForm[key as keyof typeof searchForm] = ''
   })
 }
 
-// 更多筛选
-const handleMoreOptions = () => {
-  ElMessage.info('更多筛选功能开发中')
-}
-
-// 新增专栏
-const handleAddColumn = () => {
+function handleAddColumn() {
   router.push('/column/create')
 }
 
-// 分享功能
-const handleShareFunction = () => {
-  ElMessage.info('分享功能开发中')
+function handleShareFunction() {
+  Message.info('分享功能开发中')
 }
 
-// 序号排序
-const handleSortByOrder = () => {
-  ElMessage.info('序号排序功能开发中')
+function handleSortByOrder() {
+  Message.info('序号排序功能开发中')
 }
 
-// 批量上架
-const handleBatchPublish = () => {
+function handleBatchPublish() {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请选择要上架的专栏')
+    Message.warning('请选择要上架的专栏')
     return
   }
-  ElMessage.success(`已上架 ${selectedRows.value.length} 个专栏`)
+  Message.success(`已上架 ${selectedRows.value.length} 个专栏`)
 }
 
-// 批量下架
-const handleBatchUnpublish = () => {
+function handleBatchUnpublish() {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请选择要下架的专栏')
+    Message.warning('请选择要下架的专栏')
     return
   }
-  ElMessage.success(`已下架 ${selectedRows.value.length} 个专栏`)
+  Message.success(`已下架 ${selectedRows.value.length} 个专栏`)
 }
 
-// 批量删除
-const handleBatchDelete = () => {
+function handleBatchDelete() {
   if (selectedRows.value.length === 0) {
-    ElMessage.warning('请选择要删除的专栏')
+    Message.warning('请选择要删除的专栏')
     return
   }
-  ElMessage.success(`已删除 ${selectedRows.value.length} 个专栏`)
+  Message.success(`已删除 ${selectedRows.value.length} 个专栏`)
 }
 
-// 更新创作量
-const handleUpdateCreationCount = () => {
-  ElMessage.info('更新创作量功能开发中')
+function handleUpdateCreationCount() {
+  Message.info('更新创作量功能开发中')
 }
 
-// 查看详情
-const handleViewDetail = (row: any) => {
+function handleViewDetail(row: any) {
   router.push(`/column/detail/${row.id}`)
 }
 
-// 编辑
-const handleEdit = (row: any) => {
+function handleEdit(row: any) {
   router.push(`/column/detail/${row.id}`)
 }
 
-// 分享
-const handleShare = (row: any) => {
-  ElMessage.info('分享功能开发中')
+function handleShare(row: any) {
+  Message.info('分享功能开发中')
 }
 
-// 上架
-const handlePublish = (row: any) => {
-  ElMessage.success(`已上架专栏：${row.name}`)
+function handlePublish(row: any) {
+  Message.success(`已上架专栏：${row.name}`)
 }
 
-// 下架
-const handleUnpublish = (row: any) => {
-  ElMessage.success(`已下架专栏：${row.name}`)
+function handleUnpublish(row: any) {
+  Message.success(`已下架专栏：${row.name}`)
 }
 
-// 删除
-const handleDelete = (row: any) => {
-  ElMessage.success(`已删除专栏：${row.name}`)
+function handleDelete(row: any) {
+  Message.success(`已删除专栏：${row.name}`)
 }
 
-// 选择变化
-const handleSelectionChange = (val: any[]) => {
-  selectedRows.value = val
+function handleSelectionChange(keys: any[], rows: any[]) {
+  selectedRows.value = rows
 }
 
-// 分页变化
-const handleSizeChange = (size: number) => {
-  pagination.size = size
-}
-
-const handleCurrentChange = (page: number) => {
+function handlePageChange(page: number) {
   pagination.page = page
+}
+
+function handleSizeChange(size: number) {
+  pagination.size = size
+  pagination.page = 1
 }
 </script>
 
 <style scoped lang="scss">
-.column-list {
-  .search-filter {
-    margin-bottom: 20px;
-    background: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
+.column-list-page {
+  .search-card {
+    margin-bottom: 16px;
   }
 
-  .action-buttons {
-    margin-bottom: 20px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .data-list {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-    padding: 20px;
+  .table-card {
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
 
     .column-cover {
       width: 80px;
@@ -444,7 +413,7 @@ const handleCurrentChange = (page: number) => {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 4px;
+        border-radius: var(--arco-radius-medium);
       }
 
       .cover-placeholder {
@@ -453,12 +422,12 @@ const handleCurrentChange = (page: number) => {
         display: flex;
         align-items: center;
         justify-content: center;
-        background: #f0f0f0;
-        border-radius: 4px;
-        
-        .el-icon {
+        background: var(--arco-fill-color-1);
+        border-radius: var(--arco-radius-medium);
+
+        .arco-icon {
           font-size: 24px;
-          color: #999;
+          color: var(--arco-text-color-3);
         }
       }
     }
@@ -467,30 +436,31 @@ const handleCurrentChange = (page: number) => {
       .column-name {
         font-weight: 500;
         margin-bottom: 8px;
+        color: var(--arco-text-color-1);
       }
 
       .column-price {
         .price {
           margin-right: 8px;
-          
+
           &.current {
-            color: #ff4d4f;
+            color: var(--arco-danger-color-6);
             font-weight: 500;
           }
 
           &.original {
-            color: #999;
+            color: var(--arco-text-color-3);
             text-decoration: line-through;
           }
         }
       }
     }
+  }
 
-    .pagination {
-      margin-top: 20px;
-      display: flex;
-      justify-content: flex-end;
-    }
+  .pagination-wrapper {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
   }
 }
 </style>

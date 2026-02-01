@@ -4,44 +4,42 @@
       <h2>销售统计</h2>
     </div>
     <div class="page-content">
-      <el-row :gutter="24">
-        <el-col :span="6" v-for="stat in stats" :key="stat.key">
-          <el-card class="stat-card">
+      <a-row :gutter="24">
+        <a-col :span="6" v-for="stat in stats" :key="stat.key">
+          <a-card class="stat-card">
             <div class="stat-icon" :style="{ background: stat.iconBg }">
-              <el-icon :size="32">
-                <component :is="stat.icon" />
-              </el-icon>
+              <a-icon :name="stat.icon" :size="32" />
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stat.value }}</div>
               <div class="stat-label">{{ stat.label }}</div>
               <div v-if="stat.growth" class="stat-growth" :class="stat.growth > 0 ? 'positive' : 'negative'">
-                <el-icon><TrendCharts /></el-icon>
-                { Math.abs(stat.growth) }%
+                <a-icon name="bar-chart" />
+                {{ Math.abs(stat.growth) }}%
               </div>
             </div>
-          </el-card>
-        </el-col>
-      </el-row>
+          </a-card>
+        </a-col>
+      </a-row>
 
-      <el-row :gutter="24" style="margin-top: 24px;">
-        <el-col :span="12">
-          <el-card class="chart-card" body-style="padding: 20px">
+      <a-row :gutter="24" style="margin-top: 24px;">
+        <a-col :span="12">
+          <a-card class="chart-card" body-style="padding: 20px">
             <div class="chart-header">销售额趋势</div>
             <div class="chart-container">
               <div ref="salesChartRef" style="width: 100%; height: 300px;"></div>
             </div>
-          </el-card>
-        </el-col>
-        <el-col :span="12">
-          <el-card class="chart-card" body-style="padding: 20px">
+          </a-card>
+        </a-col>
+        <a-col :span="12">
+          <a-card class="chart-card" body-style="padding: 20px">
             <div class="chart-header">支付方式分布</div>
             <div class="chart-container">
               <div ref="paymentChartRef" style="width: 100%; height: 300px;"></div>
             </div>
-          </el-card>
-        </el-col>
-      </el-row>
+          </a-card>
+        </a-col>
+      </a-row>
     </div>
   </div>
 </template>
@@ -51,14 +49,14 @@ import { ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
 
 const stats = ref([
-  { key: 'totalOrders', label: '总订单数', value: '8,956', icon: 'List', iconBg: '#f0f9eb' },
-  { key: 'totalIncome', label: '总收入', value: '¥1,258,000', icon: 'Coin', iconBg: '#f0f5ff' },
-  { key: 'todayOrders', label: '今日订单', value: '89', icon: 'Plus', iconBg: '#e6f7ff' },
-  { key: 'todayIncome', label: '今日收入', value: '¥12,580', icon: 'TrendCharts', iconBg: '#fff7e6' },
-  { key: 'weekOrders', label: '周订单', value: '2,586', icon: 'Calendar', iconBg: '#f6ffed' },
-  { key: 'weekIncome', label: '周收入', value: '¥1,896,000', icon: 'CalendarFilled', iconBg: '#f5f0f8' },
-  { key: 'monthOrders', label: '月订单', value: '5,896', icon: 'Calendar', iconBg: '#fff7e6' },
-  { key: 'monthIncome', label: '月收入', value: '¥1,258,000', icon: 'TrendCharts', iconBg: '#f6ffed' }
+  { key: 'totalOrders', label: '总订单数', value: '8,956', icon: 'list', iconBg: '#f0f9eb' },
+  { key: 'totalIncome', label: '总收入', value: '¥1,258,000', icon: 'dollar-circle', iconBg: '#f0f5ff' },
+  { key: 'todayOrders', label: '今日订单', value: '89', icon: 'plus', iconBg: '#e6f7ff' },
+  { key: 'todayIncome', label: '今日收入', value: '¥12,580', icon: 'bar-chart', iconBg: '#fff7e6' },
+  { key: 'weekOrders', label: '周订单', value: '2,586', icon: 'calendar', iconBg: '#f6ffed' },
+  { key: 'weekIncome', label: '周收入', value: '¥1,896,000', icon: 'calendar', iconBg: '#f5f0f8' },
+  { key: 'monthOrders', label: '月订单', value: '5,896', icon: 'calendar', iconBg: '#fff7e6' },
+  { key: 'monthIncome', label: '月收入', value: '¥1,258,000', icon: 'bar-chart', iconBg: '#f6ffed' }
 ])
 
 const salesChartRef = ref<HTMLElement>()
@@ -169,7 +167,7 @@ onMounted(() => {
     justify-content: center;
     margin-right: 16px;
 
-    .el-icon {
+    :deep(.arco-icon) {
       color: #fff;
     }
   }
@@ -180,25 +178,28 @@ onMounted(() => {
     .stat-value {
       font-size: 24px;
       font-weight: bold;
-      color: #333;
+      color: var(--arco-text-color-1);
       margin-bottom: 4px;
     }
 
     .stat-label {
       font-size: 14px;
-      color: #666;
+      color: var(--arco-text-color-3);
     }
 
     .stat-growth {
       font-size: 12px;
       margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
 
       &.positive {
-        color: #67c23a;
+        color: var(--arco-success-6);
       }
 
       &.negative {
-        color: #f56c6c;
+        color: var(--arco-error-6);
       }
     }
   }
@@ -211,7 +212,7 @@ onMounted(() => {
   .chart-header {
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: var(--arco-text-color-1);
     margin-bottom: 16px;
   }
 }

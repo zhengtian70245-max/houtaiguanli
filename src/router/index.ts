@@ -20,6 +20,12 @@ const routes: RouteRecordRaw[] = [
         name: 'Dashboard',
         component: () => import('@/views/statistics/dashboard.vue'),
         meta: { title: '数据概览', icon: 'DataAnalysis' }
+      },
+      {
+        path: '/test',
+        name: 'Test',
+        component: () => import('@/views/test/index.vue'),
+        meta: { title: '测试页面', icon: 'File' }
       }
     ]
   },
@@ -78,7 +84,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/user/detail/:id',
         name: 'UserDetail',
-        component: () => import('@/views/user/detail.vue'),
+        component: () => import('@/views/common/detail.vue'),
         meta: { title: '用户详情', hidden: true }
       },
       {
@@ -162,7 +168,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/column/detail/:id',
         name: 'ColumnDetail',
-        component: () => import('@/views/column/detail.vue'),
+        component: () => import('@/views/common/detail.vue'),
         meta: { title: '专栏详情', hidden: true }
       },
       {
@@ -222,7 +228,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/order/detail/:id',
         name: 'OrderDetail',
-        component: () => import('@/views/order/detail.vue'),
+        component: () => import('@/views/common/detail.vue'),
         meta: { title: '订单详情', hidden: true }
       },
       {

@@ -2,339 +2,352 @@
   <div class="video-manager">
     <!-- 操作栏 -->
     <div class="video-actions">
-      <el-button type="primary" @click="handleUploadVideo">
-        <el-icon><UploadFilled /></el-icon>
+      <a-button type="primary" @click="handleUploadVideo">
+        <template #icon>
+          <icon-upload />
+        </template>
         上传课件
-      </el-button>
-      <el-button @click="handleSelectFromMaterial">
-          <el-icon><FolderOpened /></el-icon>
-          从素材库选择
-        </el-button>
-      <el-button @click="handleBatchDelete" :disabled="selectedVideoIds.length === 0">
-        <el-icon><Delete /></el-icon>
+      </a-button>
+      <a-button @click="handleSelectFromMaterial">
+        <template #icon>
+          <icon-folder />
+        </template>
+        从素材库选择
+      </a-button>
+      <a-button @click="handleBatchDelete" :disabled="selectedVideoIds.length === 0">
+        <template #icon>
+          <icon-delete />
+        </template>
         批量删除
-      </el-button>
-      <el-button @click="handleRefresh">
-        <el-icon><Refresh /></el-icon>
+      </a-button>
+      <a-button @click="handleRefresh">
+        <template #icon>
+          <icon-refresh />
+        </template>
         刷新
-      </el-button>
+      </a-button>
     </div>
 
     <!-- 搜索筛选 -->
-    <el-form :inline="true" :model="searchForm" class="search-form">
-      <el-form-item label="课件名称">
-        <el-input v-model="searchForm.keyword" placeholder="请输入课件名称" clearable />
-      </el-form-item>
-      <el-form-item label="课件类型">
-        <el-select v-model="searchForm.type" placeholder="请选择课件类型" clearable>
-          <el-option label="全部" :value="0" />
-          <el-option label="视频" :value="1" />
-          <el-option label="音频" :value="2" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="状态">
-        <el-select v-model="searchForm.status" placeholder="请选择状态" clearable>
-          <el-option label="全部" :value="-1" />
-          <el-option label="就绪" :value="2" />
-          <el-option label="上传中" :value="0" />
-          <el-option label="转码中" :value="1" />
-          <el-option label="失败" :value="3" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleSearch">搜索</el-button>
-        <el-button @click="handleReset">重置</el-button>
-      </el-form-item>
-    </el-form>
+    <a-form :model="searchForm" class="search-form" layout="inline">
+      <a-form-item label="课件名称">
+        <a-input v-model="searchForm.keyword" placeholder="请输入课件名称" allow-clear />
+      </a-form-item>
+      <a-form-item label="课件类型">
+        <a-select v-model="searchForm.type" placeholder="请选择课件类型" allow-clear>
+          <a-option label="全部" :value="0" />
+          <a-option label="视频" :value="1" />
+          <a-option label="音频" :value="2" />
+        </a-select>
+      </a-form-item>
+      <a-form-item label="状态">
+        <a-select v-model="searchForm.status" placeholder="请选择状态" allow-clear>
+          <a-option label="全部" :value="-1" />
+          <a-option label="就绪" :value="2" />
+          <a-option label="上传中" :value="0" />
+          <a-option label="转码中" :value="1" />
+          <a-option label="失败" :value="3" />
+        </a-select>
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="handleSearch">搜索</a-button>
+        <a-button @click="handleReset">重置</a-button>
+      </a-form-item>
+    </a-form>
 
     <!-- 课件列表 -->
-    <el-table
-      v-loading="loading"
+    <a-table
+      :loading="loading"
       :data="filteredVideos"
-      style="width: 100%"
-      border
+      bordered
       stripe
-      @selection-change="handleSelectionChange"
+      @row-selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="id" label="ID" width="80" align="center" />
-      <el-table-column prop="title" label="课件标题" min-width="200">
-        <template #default="{ row }">
+      <template #selection>
+        <a-checkbox />
+      </template>
+      <a-table-column data-index="id" title="ID" width="80" align="center" />
+      <a-table-column data-index="title" title="课件标题" min-width="200">
+        <template #cell="{ record }">
           <div class="video-title">
-            <el-icon :size="20">
-              <VideoCameraFilled v-if="row.type === 1" />
-              <Headset v-else />
-            </el-icon>
-            <span>{{ row.title }}</span>
+            <a-icon :name="record.type === 1 ? 'video-camera' : 'headphones'" />
+            <span>{{ record.title }}</span>
           </div>
         </template>
-      </el-table-column>
-      <el-table-column label="所属章节" width="180" align="center">
-        <template #default="{ row }">
-          <span>{{ getChapterName(row.chapterId) || '未分配' }}</span>
+      </a-table-column>
+      <a-table-column title="所属章节" width="180" align="center">
+        <template #cell="{ record }">
+          <span>{{ getChapterName(record.chapterId) || '未分配' }}</span>
         </template>
-      </el-table-column>
-      <el-table-column label="时长" width="100" align="center">
-        <template #default="{ row }">
-          {{ formatDuration(row.duration) }}
+      </a-table-column>
+      <a-table-column title="时长" width="100" align="center">
+        <template #cell="{ record }">
+          {{ formatDuration(record.duration) }}
         </template>
-      </el-table-column>
-      <el-table-column label="大小" width="120" align="center">
-        <template #default="{ row }">
-          {{ formatFileSize(row.size) }}
+      </a-table-column>
+      <a-table-column title="大小" width="120" align="center">
+        <template #cell="{ record }">
+          {{ formatFileSize(record.size) }}
         </template>
-      </el-table-column>
-      <el-table-column label="状态" width="120" align="center">
-        <template #default="{ row }">
-          <el-tag :type="getStatusType(row.status)">
-            {{ getStatusText(row.status) }}
-          </el-tag>
+      </a-table-column>
+      <a-table-column title="状态" width="120" align="center">
+        <template #cell="{ record }">
+          <a-tag :color="getStatusType(record.status)">
+            {{ getStatusText(record.status) }}
+          </a-tag>
         </template>
-      </el-table-column>
-      <el-table-column prop="uploadTime" label="上传时间" width="180" align="center" />
-      <el-table-column label="操作" width="250" align="center">
-        <template #default="{ row }">
-          <el-button size="small" type="primary" @click="handleEditVideo(row)">
-            <el-icon><Edit /></el-icon>
+      </a-table-column>
+      <a-table-column data-index="uploadTime" title="上传时间" width="180" align="center" />
+      <a-table-column title="操作" width="250" align="center">
+        <template #cell="{ record }">
+          <a-button size="small" type="primary" @click="handleEditVideo(record)">
+            <template #icon>
+              <icon-edit />
+            </template>
             编辑
-          </el-button>
-          <el-button size="small" @click="handlePreviewVideo(row)">
-            <el-icon><VideoPlay /></el-icon>
+          </a-button>
+          <a-button size="small" @click="handlePreviewVideo(record)">
+            <template #icon>
+              <icon-play-circle />
+            </template>
             预览
-          </el-button>
-          <el-button size="small" @click="handleAssignChapter(row)">
-            <el-icon><Link /></el-icon>
+          </a-button>
+          <a-button size="small" @click="handleAssignChapter(record)">
+            <template #icon>
+              <icon-link />
+            </template>
             分配章节
-          </el-button>
-          <el-button size="small" type="danger" @click="handleDeleteVideo(row)">
-            <el-icon><Delete /></el-icon>
+          </a-button>
+          <a-button size="small" type="danger" @click="handleDeleteVideo(record)">
+            <template #icon>
+              <icon-delete />
+            </template>
             删除
-          </el-button>
+          </a-button>
         </template>
-      </el-table-column>
-    </el-table>
+      </a-table-column>
+    </a-table>
 
     <!-- 分页 -->
     <div class="pagination-wrapper">
-      <el-pagination
-        v-model:current-page="pagination.page"
+      <a-pagination
+        v-model:current="pagination.page"
         v-model:page-size="pagination.size"
         :page-sizes="[10, 20, 50, 100]"
-        layout="total, sizes, prev, pager, next, jumper"
         :total="filteredVideos.length"
         @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
+        @change="handleCurrentChange"
       />
     </div>
 
     <!-- 上传视频对话框 -->
-    <el-dialog
-      v-model="uploadDialogVisible"
+    <a-modal
+      v-model:visible="uploadDialogVisible"
       title="上传课件"
       width="500px"
     >
-      <el-form :model="uploadForm" label-width="80px">
-        <el-form-item label="课件名称">
-          <el-input v-model="uploadForm.title" placeholder="请输入课件名称" />
-        </el-form-item>
-        <el-form-item label="课件类型">
-          <el-select v-model="uploadForm.type" placeholder="请选择课件类型">
-            <el-option label="视频" :value="1" />
-            <el-option label="音频" :value="2" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="所属章节">
-          <el-select v-model="uploadForm.chapterId" placeholder="请选择章节">
-            <el-option label="未分配" :value="0" />
-            <el-option
+      <a-form :model="uploadForm" label-width="80px">
+        <a-form-item label="课件名称">
+          <a-input v-model="uploadForm.title" placeholder="请输入课件名称" />
+        </a-form-item>
+        <a-form-item label="课件类型">
+          <a-select v-model="uploadForm.type" placeholder="请选择课件类型">
+            <a-option label="视频" :value="1" />
+            <a-option label="音频" :value="2" />
+          </a-select>
+        </a-form-item>
+        <a-form-item label="所属章节">
+          <a-select v-model="uploadForm.chapterId" placeholder="请选择章节">
+            <a-option label="未分配" :value="0" />
+            <a-option
               v-for="chapter in props.course.chapters"
               :key="chapter.id"
               :label="chapter.title"
               :value="chapter.id"
             />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="课件文件">
-          <el-upload
+          </a-select>
+        </a-form-item>
+        <a-form-item label="课件文件">
+          <a-upload
             class="upload-demo"
-            action="#"
+            :action="'#'"
             :auto-upload="false"
             :show-file-list="true"
-            :on-change="handleFileChange"
-            :before-upload="beforeUpload"
+            @change="handleFileChange"
           >
-            <el-button type="primary">
-              <el-icon><Upload /></el-icon>
+            <a-button type="primary">
+              <template #icon>
+                <icon-upload />
+              </template>
               选择文件
-            </el-button>
+            </a-button>
             <template #tip>
-              <div class="el-upload__tip">
+              <div class="upload-tip">
                 {{ uploadForm.type === 1 ? '请上传视频文件（MP4、MOV等）' : '请上传音频文件（MP3、WAV等）' }}
               </div>
             </template>
-          </el-upload>
-        </el-form-item>
-      </el-form>
+          </a-upload>
+        </a-form-item>
+      </a-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="uploadDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleConfirmUpload">确定上传</el-button>
+          <a-button @click="uploadDialogVisible = false">取消</a-button>
+          <a-button type="primary" @click="handleConfirmUpload">确定上传</a-button>
         </span>
       </template>
-    </el-dialog>
+    </a-modal>
 
     <!-- 从素材库选择对话框 -->
-    <el-dialog
-      v-model="materialDialogVisible"
+    <a-modal
+      v-model:visible="materialDialogVisible"
       title="从素材库选择"
       width="800px"
     >
       <div class="material-selector">
-        <el-form :inline="true" :model="materialSearchForm" class="search-form">
-          <el-form-item label="素材名称">
-            <el-input v-model="materialSearchForm.keyword" placeholder="请输入素材名称" clearable />
-          </el-form-item>
-          <el-form-item label="素材类型">
-            <el-select v-model="materialSearchForm.type" placeholder="请选择素材类型" clearable>
-              <el-option label="全部" :value="0" />
-              <el-option label="视频" :value="1" />
-              <el-option label="音频" :value="2" />
-            </el-select>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="handleSearchMaterial">搜索</el-button>
-            <el-button @click="handleResetMaterialSearch">重置</el-button>
-          </el-form-item>
-        </el-form>
+        <a-form :model="materialSearchForm" class="search-form" layout="inline">
+          <a-form-item label="素材名称">
+            <a-input v-model="materialSearchForm.keyword" placeholder="请输入素材名称" allow-clear />
+          </a-form-item>
+          <a-form-item label="素材类型">
+            <a-select v-model="materialSearchForm.type" placeholder="请选择素材类型" allow-clear>
+              <a-option label="全部" :value="0" />
+              <a-option label="视频" :value="1" />
+              <a-option label="音频" :value="2" />
+            </a-select>
+          </a-form-item>
+          <a-form-item>
+            <a-button type="primary" @click="handleSearchMaterial">搜索</a-button>
+            <a-button @click="handleResetMaterialSearch">重置</a-button>
+          </a-form-item>
+        </a-form>
 
-        <el-table
+        <a-table
           :data="materialList"
-          style="width: 100%"
-          border
+          bordered
           stripe
-          @selection-change="handleMaterialSelectionChange"
+          @row-selection-change="handleMaterialSelectionChange"
         >
-          <el-table-column type="selection" width="55" />
-          <el-table-column prop="id" label="ID" width="80" align="center" />
-          <el-table-column prop="name" label="素材名称" min-width="200" />
-          <el-table-column label="素材类型" width="100" align="center">
-            <template #default="{ row }">
-              <el-tag :type="row.type === 1 ? 'info' : 'success'">
-                {{ row.type === 1 ? '视频' : '音频' }}
-              </el-tag>
+          <template #selection>
+            <a-checkbox />
+          </template>
+          <a-table-column data-index="id" title="ID" width="80" align="center" />
+          <a-table-column data-index="name" title="素材名称" min-width="200" />
+          <a-table-column title="素材类型" width="100" align="center">
+            <template #cell="{ record }">
+              <a-tag :color="record.type === 1 ? 'blue' : 'green'">
+                {{ record.type === 1 ? '视频' : '音频' }}
+              </a-tag>
             </template>
-          </el-table-column>
-          <el-table-column label="大小" width="120" align="center">
-            <template #default="{ row }">
-              {{ formatFileSize(row.size) }}
+          </a-table-column>
+          <a-table-column title="大小" width="120" align="center">
+            <template #cell="{ record }">
+              {{ formatFileSize(record.size) }}
             </template>
-          </el-table-column>
-          <el-table-column label="时长" width="100" align="center">
-            <template #default="{ row }">
-              {{ formatDuration(row.duration) }}
+          </a-table-column>
+          <a-table-column title="时长" width="100" align="center">
+            <template #cell="{ record }">
+              {{ formatDuration(record.duration) }}
             </template>
-          </el-table-column>
-          <el-table-column label="状态" width="100" align="center">
-            <template #default="{ row }">
-              <el-tag :type="row.status ? 'success' : 'danger'">
-                {{ row.status ? '可用' : '禁用' }}
-              </el-tag>
+          </a-table-column>
+          <a-table-column title="状态" width="100" align="center">
+            <template #cell="{ record }">
+              <a-tag :color="record.status ? 'green' : 'red'">
+                {{ record.status ? '可用' : '禁用' }}
+              </a-tag>
             </template>
-          </el-table-column>
-        </el-table>
+          </a-table-column>
+        </a-table>
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="materialDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleConfirmSelectMaterial" :disabled="selectedMaterialIds.length === 0">
+          <a-button @click="materialDialogVisible = false">取消</a-button>
+          <a-button type="primary" @click="handleConfirmSelectMaterial" :disabled="selectedMaterialIds.length === 0">
             确定选择
-          </el-button>
+          </a-button>
         </span>
       </template>
-    </el-dialog>
+    </a-modal>
 
     <!-- 编辑视频对话框 -->
-    <el-dialog
-      v-model="editDialogVisible"
+    <a-modal
+      v-model:visible="editDialogVisible"
       title="编辑课件"
       width="500px"
     >
-      <el-form :model="editForm" label-width="80px">
-        <el-form-item label="课件名称">
-          <el-input v-model="editForm.title" placeholder="请输入课件名称" />
-        </el-form-item>
-        <el-form-item label="所属章节">
-          <el-select v-model="editForm.chapterId" placeholder="请选择章节">
-            <el-option label="未分配" :value="0" />
-            <el-option
+      <a-form :model="editForm" label-width="80px">
+        <a-form-item label="课件名称">
+          <a-input v-model="editForm.title" placeholder="请输入课件名称" />
+        </a-form-item>
+        <a-form-item label="所属章节">
+          <a-select v-model="editForm.chapterId" placeholder="请选择章节">
+            <a-option label="未分配" :value="0" />
+            <a-option
               v-for="chapter in props.course.chapters"
               :key="chapter.id"
               :label="chapter.title"
               :value="chapter.id"
             />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="课件描述">
-          <el-input
+          </a-select>
+        </a-form-item>
+        <a-form-item label="课件描述">
+          <a-textarea
             v-model="editForm.description"
-            type="textarea"
             :rows="4"
             placeholder="请输入课件描述"
           />
-        </el-form-item>
-      </el-form>
+        </a-form-item>
+      </a-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleConfirmEdit">确定修改</el-button>
+          <a-button @click="editDialogVisible = false">取消</a-button>
+          <a-button type="primary" @click="handleConfirmEdit">确定修改</a-button>
         </span>
       </template>
-    </el-dialog>
+    </a-modal>
 
     <!-- 分配章节对话框 -->
-    <el-dialog
-      v-model="assignDialogVisible"
+    <a-modal
+      v-model:visible="assignDialogVisible"
       title="分配章节"
       width="400px"
     >
-      <el-form :model="assignForm" label-width="80px">
-        <el-form-item label="所属章节">
-          <el-select v-model="assignForm.chapterId" placeholder="请选择章节">
-            <el-option label="未分配" :value="0" />
-            <el-option
+      <a-form :model="assignForm" label-width="80px">
+        <a-form-item label="所属章节">
+          <a-select v-model="assignForm.chapterId" placeholder="请选择章节">
+            <a-option label="未分配" :value="0" />
+            <a-option
               v-for="chapter in props.course.chapters"
               :key="chapter.id"
               :label="chapter.title"
               :value="chapter.id"
             />
-          </el-select>
-        </el-form-item>
-      </el-form>
+          </a-select>
+        </a-form-item>
+      </a-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="assignDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleConfirmAssign">确定分配</el-button>
+          <a-button @click="assignDialogVisible = false">取消</a-button>
+          <a-button type="primary" @click="handleConfirmAssign">确定分配</a-button>
         </span>
       </template>
-    </el-dialog>
+    </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { Message, Modal } from '@arco-design/web-vue'
 import {
-  UploadFilled,
-  FolderOpened,
-  Delete,
-  Refresh,
-  VideoCameraFilled,
-  Headset,
-  Upload,
-  Edit,
-  VideoPlay,
-  Link
-} from '@element-plus/icons-vue'
+  IconUpload,
+  IconFolder,
+  IconDelete,
+  IconRefresh,
+  IconVideoCamera,
+  IconHeadphones,
+  IconEdit,
+  IconPlayCircle,
+  IconLink
+} from '@arco-design/web-vue/es/icon'
 
 const props = defineProps<{
   course: any
@@ -476,10 +489,10 @@ function getChapterName(chapterId: number): string {
 // 获取状态类型
 function getStatusType(status: number): string {
   switch (status) {
-    case 0: return 'warning'
-    case 1: return 'info'
-    case 2: return 'success'
-    case 3: return 'danger'
+    case 0: return 'yellow'
+    case 1: return 'blue'
+    case 2: return 'green'
+    case 3: return 'red'
     default: return ''
   }
 }
@@ -517,28 +530,26 @@ function handleSelectFromMaterial() {
 
 // 批量删除
 function handleBatchDelete() {
-  ElMessageBox.confirm(
-    `确定要删除选中的${selectedVideoIds.value.length}个课件吗？`,
-    '批量删除',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'danger'
+  Modal.confirm({
+    title: '批量删除',
+    content: `确定要删除选中的${selectedVideoIds.value.length}个课件吗？`,
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      const updatedCoursewares = props.course.coursewares.filter(
+        (video: any) => !selectedVideoIds.value.includes(video.id)
+      )
+      const updatedCourse = { ...props.course, coursewares: updatedCoursewares }
+      emit('update:course', updatedCourse)
+      selectedVideoIds.value = []
+      Message.success('批量删除成功')
     }
-  ).then(() => {
-    const updatedCoursewares = props.course.coursewares.filter(
-      (video: any) => !selectedVideoIds.value.includes(video.id)
-    )
-    const updatedCourse = { ...props.course, coursewares: updatedCoursewares }
-    emit('update:course', updatedCourse)
-    selectedVideoIds.value = []
-    ElMessage.success('批量删除成功')
-  }).catch(() => {})
+  })
 }
 
 // 刷新
 function handleRefresh() {
-  ElMessage.success('刷新成功')
+  Message.success('刷新成功')
 }
 
 // 编辑视频
@@ -552,20 +563,20 @@ function handleEditVideo(video: any) {
 
 // 预览视频
 function handlePreviewVideo(video: any) {
-  ElMessageBox.alert(
-    `<div style="text-align: center;">
-      <h3>${video.title}</h3>
-      <p>类型: ${video.type === 1 ? '视频' : '音频'}</p>
-      <p>大小: ${formatFileSize(video.size)}</p>
-      <p>时长: ${formatDuration(video.duration)}</p>
-      <p>URL: ${video.url}</p>
-      ${video.description ? `<p>描述: ${video.description}</p>` : ''}
-    </div>`,
-    '课件预览',
-    {
-      dangerouslyUseHTMLString: true
-    }
-  )
+  Modal.info({
+    title: '课件预览',
+    content: `
+      <div style="text-align: center;">
+        <h3>${video.title}</h3>
+        <p>类型: ${video.type === 1 ? '视频' : '音频'}</p>
+        <p>大小: ${formatFileSize(video.size)}</p>
+        <p>时长: ${formatDuration(video.duration)}</p>
+        <p>URL: ${video.url}</p>
+        ${video.description ? `<p>描述: ${video.description}</p>` : ''}
+      </div>
+    `,
+    dangerouslyUseHTMLString: true
+  })
 }
 
 // 分配章节
@@ -577,57 +588,36 @@ function handleAssignChapter(video: any) {
 
 // 删除视频
 function handleDeleteVideo(video: any) {
-  ElMessageBox.confirm(
-    `确定要删除课件"${video.title}"吗？`,
-    '删除确认',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'danger'
+  Modal.confirm({
+    title: '删除确认',
+    content: `确定要删除课件"${video.title}"吗？`,
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      const updatedCoursewares = props.course.coursewares.filter(
+        (v: any) => v.id !== video.id
+      )
+      const updatedCourse = { ...props.course, coursewares: updatedCoursewares }
+      emit('update:course', updatedCourse)
+      Message.success('删除成功')
     }
-  ).then(() => {
-    const updatedCoursewares = props.course.coursewares.filter(
-      (v: any) => v.id !== video.id
-    )
-    const updatedCourse = { ...props.course, coursewares: updatedCoursewares }
-    emit('update:course', updatedCourse)
-    ElMessage.success('删除成功')
-  }).catch(() => {})
+  })
 }
 
 // 文件变化
 function handleFileChange(file: any) {
-  uploadForm.file = file.raw
-}
-
-// 上传前验证
-function beforeUpload(file: any) {
-  const isVideo = uploadForm.type === 1 && file.type.startsWith('video/')
-  const isAudio = uploadForm.type === 2 && file.type.startsWith('audio/')
-  
-  if (!isVideo && !isAudio) {
-    ElMessage.error(uploadForm.type === 1 ? '请上传视频文件' : '请上传音频文件')
-    return false
-  }
-  
-  const isLt500M = file.size / 1024 / 1024 < 500
-  if (!isLt500M) {
-    ElMessage.error('文件大小不能超过 500MB')
-    return false
-  }
-  
-  return true
+  uploadForm.file = file.file
 }
 
 // 确认上传
 function handleConfirmUpload() {
   if (!uploadForm.title) {
-    ElMessage.error('请输入课件名称')
+    Message.error('请输入课件名称')
     return
   }
   
   if (!uploadForm.file) {
-    ElMessage.error('请选择文件')
+    Message.error('请选择文件')
     return
   }
   
@@ -653,13 +643,13 @@ function handleConfirmUpload() {
     
     uploadDialogVisible.value = false
     loading.value = false
-    ElMessage.success('上传成功')
+    Message.success('上传成功')
   }, 1500)
 }
 
 // 搜索素材
 function handleSearchMaterial() {
-  ElMessage.success('搜索成功')
+  Message.success('搜索成功')
 }
 
 // 重置素材搜索
@@ -697,13 +687,13 @@ function handleConfirmSelectMaterial() {
   emit('update:course', updatedCourse)
   
   materialDialogVisible.value = false
-  ElMessage.success(`成功添加${newVideos.length}个课件`)
+  Message.success(`成功添加${newVideos.length}个课件`)
 }
 
 // 确认编辑
 function handleConfirmEdit() {
   if (!editForm.title) {
-    ElMessage.error('请输入课件名称')
+    Message.error('请输入课件名称')
     return
   }
   
@@ -723,7 +713,7 @@ function handleConfirmEdit() {
   emit('update:course', updatedCourse)
   
   editDialogVisible.value = false
-  ElMessage.success('编辑成功')
+  Message.success('编辑成功')
 }
 
 // 确认分配章节
@@ -742,7 +732,7 @@ function handleConfirmAssign() {
   emit('update:course', updatedCourse)
   
   assignDialogVisible.value = false
-  ElMessage.success('章节分配成功')
+  Message.success('章节分配成功')
 }
 
 // 分页变化
@@ -752,6 +742,18 @@ function handleSizeChange(size: number) {
 
 function handleCurrentChange(page: number) {
   pagination.page = page
+}
+
+// 搜索
+function handleSearch() {
+  Message.success('搜索成功')
+}
+
+// 重置
+function handleReset() {
+  searchForm.keyword = ''
+  searchForm.type = 0
+  searchForm.status = -1
 }
 </script>
 
@@ -788,6 +790,12 @@ function handleCurrentChange(page: number) {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+  }
+
+  .upload-tip {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--arco-text-color-3);
   }
 }
 </style>

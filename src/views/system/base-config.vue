@@ -4,63 +4,64 @@
       <h2>基础配置</h2>
     </div>
     <div class="page-content">
-      <el-form :model="form" :label-width="'100px'" class="base-config-form">
-        <el-divider content-position="left">平台信息</el-divider>
-        <el-form-item label="平台名称">
-          <el-input v-model="form.platformName" placeholder="请输入平台名称" />
-        </el-form-item>
-        <el-form-item label="Logo上传">
-          <el-upload
-            action="#"
+      <a-form :model="form" :label-width="'100px'" class="base-config-form">
+        <a-divider orientation="left">平台信息</a-divider>
+        <a-form-item label="平台名称">
+          <a-input v-model="form.platformName" placeholder="请输入平台名称" />
+        </a-form-item>
+        <a-form-item label="Logo上传">
+          <a-upload
+            :action="'#'"
             :show-file-list="false"
             :before-upload="beforeUpload"
             :on-remove="onRemove"
           >
             <img v-if="form.logo" :src="form.logo" class="logo-preview" />
-            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="客服电话">
-          <el-input v-model="form.hotline" placeholder="请输入客服电话" />
-        </el-form-item>
-        <el-form-item label="客服邮箱">
-          <el-input v-model="form.email" placeholder="请输入客服邮箱" />
-        </el-form-item>
-        <el-form-item label="关于我们">
-          <el-input
+            <div v-else class="avatar-uploader-icon">
+              <a-icon name="plus" />
+            </div>
+          </a-upload>
+        </a-form-item>
+        <a-form-item label="客服电话">
+          <a-input v-model="form.hotline" placeholder="请输入客服电话" />
+        </a-form-item>
+        <a-form-item label="客服邮箱">
+          <a-input v-model="form.email" placeholder="请输入客服邮箱" />
+        </a-form-item>
+        <a-form-item label="关于我们">
+          <a-textarea
             v-model="form.aboutUs"
-            type="textarea"
             :rows="6"
             placeholder="请输入关于我们的内容"
           />
-        </el-form-item>
-        <el-form-item label="版权信息">
-          <el-input v-model="form.copyright" placeholder="请输入版权信息" />
-        </el-form-item>
+        </a-form-item>
+        <a-form-item label="版权信息">
+          <a-input v-model="form.copyright" placeholder="请输入版权信息" />
+        </a-form-item>
 
-        <el-divider content-position="left">其他配置</el-divider>
-        <el-form-item label="备案号">
-          <el-input v-model="form.icp" placeholder="请输入备案号" />
-        </el-form-item>
-        <el-form-item label="客服QQ">
-          <el-input v-model="form.qq" placeholder="请输入客服QQ" />
-        </el-form-item>
-        <el-form-item label="微信公众号">
-          <el-input v-model="form.wechat" placeholder="请输入微信公众号" />
-        </el-form-item>
+        <a-divider orientation="left">其他配置</a-divider>
+        <a-form-item label="备案号">
+          <a-input v-model="form.icp" placeholder="请输入备案号" />
+        </a-form-item>
+        <a-form-item label="客服QQ">
+          <a-input v-model="form.qq" placeholder="请输入客服QQ" />
+        </a-form-item>
+        <a-form-item label="微信公众号">
+          <a-input v-model="form.wechat" placeholder="请输入微信公众号" />
+        </a-form-item>
 
-        <el-form-item>
-          <el-button type="primary" :loading="loading" @click="handleSave">保存配置</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
+        <a-form-item>
+          <a-button type="primary" :loading="loading" @click="handleSave">保存配置</a-button>
+          <a-button @click="handleReset">重置</a-button>
+        </a-form-item>
+      </a-form>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { ElMessage } from 'element-plus'
+import message from '@arco-design/web-vue/es/message'
 import { mockDataService } from '@/api/mock'
 
 const loading = ref(false)
@@ -80,12 +81,12 @@ const form = reactive({
 function beforeUpload(file: any) {
   const isImage = file.type.startsWith('image/')
   if (!isImage) {
-    ElMessage.error('请上传图片文件')
+    message.error('请上传图片文件')
     return false
   }
   const isLt2M = file.size / 1024 / 1024 < 2
   if (!isLt2M) {
-    ElMessage.error('图片大小不能超过 2MB')
+    message.error('图片大小不能超过 2MB')
     return false
   }
   form.logo = URL.createObjectURL(file)
@@ -100,9 +101,9 @@ async function handleSave() {
   loading.value = true
   try {
     await mockDataService.saveSystemConfig(form)
-    ElMessage.success('保存成功')
+    message.success('保存成功')
   } catch (error) {
-    ElMessage.error('保存失败')
+    message.error('保存失败')
   } finally {
     loading.value = false
   }

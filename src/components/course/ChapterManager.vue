@@ -2,27 +2,35 @@
   <div class="chapter-manager">
     <!-- 操作栏 -->
     <div class="chapter-actions">
-      <el-button type="primary" @click="handleAddChapter">
-        <el-icon><Plus /></el-icon>
+      <a-button type="primary" @click="handleAddChapter">
+        <template #icon>
+          <icon-plus />
+        </template>
         添加章节
-      </el-button>
-      <el-button @click="handleBatchDelete" :disabled="selectedChapterIds.length === 0">
-        <el-icon><Delete /></el-icon>
+      </a-button>
+      <a-button @click="handleBatchDelete" :disabled="selectedChapterIds.length === 0">
+        <template #icon>
+          <icon-delete />
+        </template>
         批量删除
-      </el-button>
-      <el-button @click="handleSortChapters">
-        <el-icon><Top /></el-icon>
+      </a-button>
+      <a-button @click="handleSortChapters">
+        <template #icon>
+          <icon-swap />
+        </template>
         排序章节
-      </el-button>
-      <el-button @click="handleRefresh">
-        <el-icon><Refresh /></el-icon>
+      </a-button>
+      <a-button @click="handleRefresh">
+        <template #icon>
+          <icon-refresh />
+        </template>
         刷新
-      </el-button>
+      </a-button>
     </div>
 
     <!-- 章节列表 -->
     <div class="chapter-list">
-      <el-card
+      <a-card
         v-for="chapter in props.course.chapters"
         :key="chapter.id"
         class="chapter-card"
@@ -30,197 +38,203 @@
         <template #header>
           <div class="chapter-header">
             <div class="chapter-info">
-              <el-checkbox v-model="selectedChapterIds" :label="chapter.id" />
+              <a-checkbox v-model="selectedChapterIds" :value="chapter.id" />
               <span class="chapter-order">{{ chapter.order }}.</span>
               <span class="chapter-title">{{ chapter.title }}</span>
-              <el-tag size="small" class="courseware-count">
+              <a-tag size="small" class="courseware-count">
                 {{ getChapterCoursewareCount(chapter.id) }} 个课件
-              </el-tag>
+              </a-tag>
             </div>
             <div class="chapter-actions">
-              <el-button size="small" @click="handleEditChapter(chapter)">
-                <el-icon><Edit /></el-icon>
+              <a-button size="small" @click="handleEditChapter(chapter)">
+                <template #icon>
+                  <icon-edit />
+                </template>
                 编辑
-              </el-button>
-              <el-button size="small" @click="handleAddCourseware(chapter.id)">
-                <el-icon><VideoCameraFilled /></el-icon>
+              </a-button>
+              <a-button size="small" @click="handleAddCourseware(chapter.id)">
+                <template #icon>
+                  <icon-video-camera />
+                </template>
                 添加课件
-              </el-button>
-              <el-button size="small" @click="handleDeleteChapter(chapter)">
-                <el-icon><Delete /></el-icon>
+              </a-button>
+              <a-button size="small" @click="handleDeleteChapter(chapter)">
+                <template #icon>
+                  <icon-delete />
+                </template>
                 删除
-              </el-button>
-              <el-button size="small" @click="handleMoveUp(chapter)">
-                <el-icon><ArrowUp /></el-icon>
-              </el-button>
-              <el-button size="small" @click="handleMoveDown(chapter)">
-                <el-icon><ArrowDown /></el-icon>
-              </el-button>
+              </a-button>
+              <a-button size="small" @click="handleMoveUp(chapter)">
+                <template #icon>
+                  <icon-arrow-up />
+                </template>
+              </a-button>
+              <a-button size="small" @click="handleMoveDown(chapter)">
+                <template #icon>
+                  <icon-arrow-down />
+                </template>
+              </a-button>
             </div>
           </div>
         </template>
         
         <!-- 章节内课件列表 -->
         <div class="courseware-list">
-          <el-empty v-if="getChapterCoursewares(chapter.id).length === 0" description="暂无课件" />
+          <a-empty v-if="getChapterCoursewares(chapter.id).length === 0" description="暂无课件" />
           <div v-else class="courseware-items">
             <div
               v-for="courseware in getChapterCoursewares(chapter.id)"
               :key="courseware.id"
               class="courseware-item"
             >
-              <el-icon :size="16">
-                  <VideoCameraFilled v-if="courseware.type === 1" />
-                  <Headset v-else />
-                </el-icon>
+              <a-icon :name="courseware.type === 1 ? 'video-camera' : 'headphones'" />
               <span class="courseware-title">{{ courseware.title }}</span>
               <span class="courseware-duration">{{ formatDuration(courseware.duration) }}</span>
-              <el-button
+              <a-button
                 size="small"
-                circle
                 @click="handleRemoveCourseware(chapter.id, courseware.id)"
               >
-                <el-icon><Delete /></el-icon>
-              </el-button>
+                <template #icon>
+                  <icon-delete />
+                </template>
+              </a-button>
             </div>
           </div>
         </div>
-      </el-card>
+      </a-card>
       
-      <el-empty v-if="props.course.chapters.length === 0" description="暂无章节" />
+      <a-empty v-if="props.course.chapters.length === 0" description="暂无章节" />
     </div>
 
     <!-- 添加章节对话框 -->
-    <el-dialog
-      v-model="addDialogVisible"
+    <a-modal
+      v-model:visible="addDialogVisible"
       title="添加章节"
       width="400px"
     >
-      <el-form :model="addForm" label-width="80px">
-        <el-form-item label="章节名称" required>
-          <el-input v-model="addForm.title" placeholder="请输入章节名称" />
-        </el-form-item>
-        <el-form-item label="排序位置">
-          <el-input-number
+      <a-form :model="addForm" label-width="80px">
+        <a-form-item label="章节名称" required>
+          <a-input v-model="addForm.title" placeholder="请输入章节名称" />
+        </a-form-item>
+        <a-form-item label="排序位置">
+          <a-input-number
             v-model="addForm.order"
             :min="1"
             :max="props.course.chapters.length + 1"
             :step="1"
           />
-        </el-form-item>
-      </el-form>
+        </a-form-item>
+      </a-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="addDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleConfirmAdd">确定添加</el-button>
+          <a-button @click="addDialogVisible = false">取消</a-button>
+          <a-button type="primary" @click="handleConfirmAdd">确定添加</a-button>
         </span>
       </template>
-    </el-dialog>
+    </a-modal>
 
     <!-- 编辑章节对话框 -->
-    <el-dialog
-      v-model="editDialogVisible"
+    <a-modal
+      v-model:visible="editDialogVisible"
       title="编辑章节"
       width="400px"
     >
-      <el-form :model="editForm" label-width="80px">
-        <el-form-item label="章节名称" required>
-          <el-input v-model="editForm.title" placeholder="请输入章节名称" />
-        </el-form-item>
-      </el-form>
+      <a-form :model="editForm" label-width="80px">
+        <a-form-item label="章节名称" required>
+          <a-input v-model="editForm.title" placeholder="请输入章节名称" />
+        </a-form-item>
+      </a-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleConfirmEdit">确定修改</el-button>
+          <a-button @click="editDialogVisible = false">取消</a-button>
+          <a-button type="primary" @click="handleConfirmEdit">确定修改</a-button>
         </span>
       </template>
-    </el-dialog>
+    </a-modal>
 
     <!-- 添加课件到章节对话框 -->
-    <el-dialog
-      v-model="addCoursewareDialogVisible"
+    <a-modal
+      v-model:visible="addCoursewareDialogVisible"
       title="添加课件到章节"
       width="600px"
     >
       <div class="add-courseware-content">
         <h4>选择要添加的课件</h4>
-        <el-checkbox-group v-model="selectedCoursewareIds">
-          <el-checkbox
+        <div>
+          <a-checkbox
             v-for="courseware in getUnassignedCoursewares"
             :key="courseware.id"
-            :label="courseware.id"
+            v-model="selectedCoursewareIds"
+            :value="courseware.id"
             class="courseware-checkbox"
           >
             <div class="courseware-info">
-              <el-icon :size="16">
-                <VideoCameraFilled v-if="courseware.type === 1" />
-                <Headset v-else />
-              </el-icon>
+              <a-icon :name="courseware.type === 1 ? 'video-camera' : 'headphones'" />
               <span class="courseware-title">{{ courseware.title }}</span>
               <span class="courseware-meta">
                 {{ formatDuration(courseware.duration) }} · {{ formatFileSize(courseware.size) }}
               </span>
             </div>
-          </el-checkbox>
-        </el-checkbox-group>
-        <el-empty v-if="getUnassignedCoursewares.length === 0" description="暂无未分配的课件" />
+          </a-checkbox>
+        </div>
+        <a-empty v-if="getUnassignedCoursewares.length === 0" description="暂无未分配的课件" />
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="addCoursewareDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleConfirmAddCourseware" :disabled="selectedCoursewareIds.length === 0">
+          <a-button @click="addCoursewareDialogVisible = false">取消</a-button>
+          <a-button type="primary" @click="handleConfirmAddCourseware" :disabled="selectedCoursewareIds.length === 0">
             确定添加
-          </el-button>
+          </a-button>
         </span>
       </template>
-    </el-dialog>
+    </a-modal>
 
     <!-- 排序章节对话框 -->
-    <el-dialog
-      v-model="sortDialogVisible"
+    <a-modal
+      v-model:visible="sortDialogVisible"
       title="排序章节"
       width="400px"
     >
-      <el-form label-width="80px">
+      <a-form label-width="80px">
         <div
           v-for="chapter in sortedChapters"
           :key="chapter.id"
           class="sort-item"
         >
-          <el-form-item :label="chapter.title">
-            <el-input-number
+          <a-form-item :label="chapter.title">
+            <a-input-number
               v-model="chapter.order"
               :min="1"
               :max="props.course.chapters.length"
               :step="1"
             />
-          </el-form-item>
+          </a-form-item>
         </div>
-      </el-form>
+      </a-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="sortDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleConfirmSort">确定排序</el-button>
+          <a-button @click="sortDialogVisible = false">取消</a-button>
+          <a-button type="primary" @click="handleConfirmSort">确定排序</a-button>
         </span>
       </template>
-    </el-dialog>
+    </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { Message, Modal } from '@arco-design/web-vue'
 import {
-  Plus,
-  Delete,
-  Top,
-  Refresh,
-  Edit,
-  VideoCameraFilled,
-  ArrowUp,
-  ArrowDown,
-  Headset
-} from '@element-plus/icons-vue'
+  IconPlus,
+  IconDelete,
+  IconRefresh,
+  IconEdit,
+  IconVideoCamera,
+  IconArrowUp,
+  IconArrowDown,
+  IconHeadphones,
+  IconSwap
+} from '@arco-design/web-vue/es/icon'
 
 const props = defineProps<{
   course: any
@@ -311,29 +325,25 @@ function handleDeleteChapter(chapter: any) {
   const coursewareCount = getChapterCoursewareCount(chapter.id)
   
   if (coursewareCount > 0) {
-    ElMessageBox.confirm(
-      `该章节包含 ${coursewareCount} 个课件，删除章节会将这些课件设为未分配状态。确定要删除该章节吗？`,
-      '删除确认',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'danger'
+    Modal.confirm({
+      title: '删除确认',
+      content: `该章节包含 ${coursewareCount} 个课件，删除章节会将这些课件设为未分配状态。确定要删除该章节吗？`,
+      okText: '确定',
+      cancelText: '取消',
+      onOk() {
+        performDeleteChapter(chapter.id)
       }
-    ).then(() => {
-      performDeleteChapter(chapter.id)
-    }).catch(() => {})
+    })
   } else {
-    ElMessageBox.confirm(
-      '确定要删除该章节吗？',
-      '删除确认',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'danger'
+    Modal.confirm({
+      title: '删除确认',
+      content: '确定要删除该章节吗？',
+      okText: '确定',
+      cancelText: '取消',
+      onOk() {
+        performDeleteChapter(chapter.id)
       }
-    ).then(() => {
-      performDeleteChapter(chapter.id)
-    }).catch(() => {})
+    })
   }
 }
 
@@ -365,51 +375,49 @@ function performDeleteChapter(chapterId: number) {
   }
   
   emit('update:course', updatedCourse)
-  ElMessage.success('章节删除成功')
+  Message.success('章节删除成功')
 }
 
 // 批量删除章节
 function handleBatchDelete() {
   if (selectedChapterIds.value.length === 0) return
   
-  ElMessageBox.confirm(
-    `确定要删除选中的${selectedChapterIds.value.length}个章节吗？`,
-    '批量删除',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'danger'
-    }
-  ).then(() => {
-    // 从章节列表中删除
-    const updatedChapters = props.course.chapters.filter(
-      (chapter: any) => !selectedChapterIds.value.includes(chapter.id)
-    )
-    
-    // 更新剩余章节的排序
-    const reorderedChapters = updatedChapters.map((chapter: any, index: number) => ({
-      ...chapter,
-      order: index + 1
-    }))
-    
-    // 将章节内的课件设为未分配
-    const updatedCoursewares = props.course.coursewares.map((courseware: any) => {
-      if (selectedChapterIds.value.includes(courseware.chapterId)) {
-        return { ...courseware, chapterId: 0 }
+  Modal.confirm({
+    title: '批量删除',
+    content: `确定要删除选中的${selectedChapterIds.value.length}个章节吗？`,
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      // 从章节列表中删除
+      const updatedChapters = props.course.chapters.filter(
+        (chapter: any) => !selectedChapterIds.value.includes(chapter.id)
+      )
+      
+      // 更新剩余章节的排序
+      const reorderedChapters = updatedChapters.map((chapter: any, index: number) => ({
+        ...chapter,
+        order: index + 1
+      }))
+      
+      // 将章节内的课件设为未分配
+      const updatedCoursewares = props.course.coursewares.map((courseware: any) => {
+        if (selectedChapterIds.value.includes(courseware.chapterId)) {
+          return { ...courseware, chapterId: 0 }
+        }
+        return courseware
+      })
+      
+      const updatedCourse = {
+        ...props.course,
+        chapters: reorderedChapters,
+        coursewares: updatedCoursewares
       }
-      return courseware
-    })
-    
-    const updatedCourse = {
-      ...props.course,
-      chapters: reorderedChapters,
-      coursewares: updatedCoursewares
+      
+      emit('update:course', updatedCourse)
+      selectedChapterIds.value = []
+      Message.success('批量删除成功')
     }
-    
-    emit('update:course', updatedCourse)
-    selectedChapterIds.value = []
-    ElMessage.success('批量删除成功')
-  }).catch(() => {})
+  })
 }
 
 // 排序章节
@@ -420,7 +428,7 @@ function handleSortChapters() {
 
 // 刷新
 function handleRefresh() {
-  ElMessage.success('刷新成功')
+  Message.success('刷新成功')
 }
 
 // 向上移动章节
@@ -439,7 +447,7 @@ function handleMoveUp(chapter: any) {
   
   const updatedCourse = { ...props.course, chapters: updatedChapters }
   emit('update:course', updatedCourse)
-  ElMessage.success('章节已上移')
+  Message.success('章节已上移')
 }
 
 // 向下移动章节
@@ -458,7 +466,7 @@ function handleMoveDown(chapter: any) {
   
   const updatedCourse = { ...props.course, chapters: updatedChapters }
   emit('update:course', updatedCourse)
-  ElMessage.success('章节已下移')
+  Message.success('章节已下移')
 }
 
 // 添加课件到章节
@@ -470,32 +478,30 @@ function handleAddCourseware(chapterId: number) {
 
 // 从章节中移除课件
 function handleRemoveCourseware(chapterId: number, coursewareId: number) {
-  ElMessageBox.confirm(
-    '确定要将该课件从章节中移除吗？',
-    '移除课件',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
+  Modal.confirm({
+    title: '移除课件',
+    content: '确定要将该课件从章节中移除吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      const updatedCoursewares = props.course.coursewares.map((courseware: any) => {
+        if (courseware.id === coursewareId) {
+          return { ...courseware, chapterId: 0 }
+        }
+        return courseware
+      })
+      
+      const updatedCourse = { ...props.course, coursewares: updatedCoursewares }
+      emit('update:course', updatedCourse)
+      Message.success('课件已移除')
     }
-  ).then(() => {
-    const updatedCoursewares = props.course.coursewares.map((courseware: any) => {
-      if (courseware.id === coursewareId) {
-        return { ...courseware, chapterId: 0 }
-      }
-      return courseware
-    })
-    
-    const updatedCourse = { ...props.course, coursewares: updatedCoursewares }
-    emit('update:course', updatedCourse)
-    ElMessage.success('课件已移除')
-  }).catch(() => {})
+  })
 }
 
 // 确认添加章节
 function handleConfirmAdd() {
   if (!addForm.value.title) {
-    ElMessage.error('请输入章节名称')
+    Message.error('请输入章节名称')
     return
   }
   
@@ -518,13 +524,13 @@ function handleConfirmAdd() {
   emit('update:course', updatedCourse)
   
   addDialogVisible.value = false
-  ElMessage.success('章节添加成功')
+  Message.success('章节添加成功')
 }
 
 // 确认编辑章节
 function handleConfirmEdit() {
   if (!editForm.value.title) {
-    ElMessage.error('请输入章节名称')
+    Message.error('请输入章节名称')
     return
   }
   
@@ -539,7 +545,7 @@ function handleConfirmEdit() {
   emit('update:course', updatedCourse)
   
   editDialogVisible.value = false
-  ElMessage.success('章节编辑成功')
+  Message.success('章节编辑成功')
 }
 
 // 确认添加课件到章节
@@ -557,7 +563,7 @@ function handleConfirmAddCourseware() {
   emit('update:course', updatedCourse)
   
   addCoursewareDialogVisible.value = false
-  ElMessage.success(`成功添加${selectedCoursewareIds.value.length}个课件到章节`)
+  Message.success(`成功添加${selectedCoursewareIds.value.length}个课件到章节`)
 }
 
 // 确认排序章节
@@ -571,7 +577,7 @@ function handleConfirmSort() {
   emit('update:course', updatedCourse)
   
   sortDialogVisible.value = false
-  ElMessage.success('章节排序成功')
+  Message.success('章节排序成功')
 }
 </script>
 

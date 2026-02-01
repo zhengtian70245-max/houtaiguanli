@@ -4,24 +4,24 @@
       <h2>用户详情</h2>
     </div>
     <div class="page-content">
-      <el-row :gutter="24">
-        <el-col :span="8">
-          <el-card>
-            <template #header>
+      <a-row :gutter="[24, 24]">
+        <a-col :span="8">
+          <a-card>
+            <template #title>
               <div class="card-header">
                 <span>基本信息</span>
               </div>
             </template>
             <div class="user-avatar">
-              <el-avatar :size="100">
+              <a-avatar :size="100" :style="{ backgroundColor: '#165dff' }">
                 {{ userInfo?.nickname?.charAt(0) }}
-              </el-avatar>
+              </a-avatar>
             </div>
             <div class="user-info">
               <p><strong>昵称：</strong>{{ userInfo?.nickname }}</p>
               <p><strong>手机号：</strong>{{ userInfo?.phone }}</p>
               <p><strong>会员等级：</strong>
-                <el-tag :type="getLevelType(userInfo?.level)">{{ getLevelText(userInfo?.level) }}</el-tag>
+                <a-tag :color="getLevelColor(userInfo?.level)">{{ getLevelText(userInfo?.level) }}</a-tag>
               </p>
               <p><strong>VIP到期时间：</strong>{{ userInfo?.vipExpireDate || '未开通' }}</p>
               <p><strong>推荐人：</strong>{{ userInfo?.recommender || '无' }}</p>
@@ -30,69 +30,81 @@
               <p><strong>注册时间：</strong>{{ userInfo?.createTime }}</p>
               <p><strong>最后登录时间：</strong>{{ userInfo?.lastLoginTime }}</p>
             </div>
-          </el-card>
-        </el-col>
-        <el-col :span="16">
-          <el-card>
-            <template #header>
+          </a-card>
+        </a-col>
+        <a-col :span="16">
+          <a-card>
+            <template #title>
               <div class="card-header">
                 <span>数据统计</span>
               </div>
             </template>
-            <el-row :gutter="16">
-              <el-col :span="6" v-for="stat in stats" :key="stat.key">
+            <a-row :gutter="[16, 16]">
+              <a-col :span="6" v-for="stat in stats" :key="stat.key">
                 <div class="stat-item">
                   <div class="stat-value">{{ stat.value }}</div>
                   <div class="stat-label">{{ stat.label }}</div>
                 </div>
-              </el-col>
-            </el-row>
-          </el-card>
+              </a-col>
+            </a-row>
+          </a-card>
 
-          <el-card style="margin-top: 24px;">
-            <template #header>
+          <a-card style="margin-top: 24px;">
+            <template #title>
               <div class="card-header">
                 <span>VIP信息</span>
-                <el-button type="primary" size="small">续费</el-button>
+                <a-button type="primary" size="small">续费</a-button>
               </div>
             </template>
-            <el-table :data="vipRecords" style="width: 100%">
-              <el-table-column prop="level" label="等级" width="120" align="center" />
-              <el-table-column prop="duration" label="时长" width="120" align="center" />
-              <el-table-column prop="price" label="价格" width="120" align="right" />
-              <el-table-column prop="startDate" label="开始时间" width="160" />
-              <el-table-column prop="expireDate" label="到期时间" width="160" />
-            </el-table>
-          </el-card>
+            <a-table
+              :data="vipRecords"
+              :pagination="false"
+              row-key="startDate"
+            >
+              <template #columns>
+                <a-table-column title="等级" data-index="level" :width="120" align="center" />
+                <a-table-column title="时长" data-index="duration" :width="120" align="center" />
+                <a-table-column title="价格" data-index="price" :width="120" align="right" />
+                <a-table-column title="开始时间" data-index="startDate" :width="160" />
+                <a-table-column title="到期时间" data-index="expireDate" :width="160" />
+              </template>
+            </a-table>
+          </a-card>
 
-          <el-card style="margin-top: 24px;">
-            <template #header>
+          <a-card style="margin-top: 24px;">
+            <template #title>
               <div class="card-header">
                 <span>学习记录</span>
-                <el-button type="primary" size="small">查看全部</el-button>
+                <a-button type="primary" size="small">查看全部</a-button>
               </div>
             </template>
-            <el-table :data="learningRecords" style="width: 100%">
-              <el-table-column prop="courseName" label="课程名称" width="200" />
-              <el-table-column prop="progress" label="进度" width="120" align="center">
-                <template #default="{ row }">
-                  <el-progress :percentage="row.progress" :stroke-width="10" :show-text="false" />
-                  <span style="margin-left: 8px;">{{ row.progress }}%</span>
-                </template>
-              </el-table-column>
-              <el-table-column prop="watchTime" label="观看时长" width="120" align="center" />
-              <el-table-column prop="status" label="状态" width="120" align="center">
-                <template #default="{ row }">
-                  <el-tag :type="row.status ? 'success' : 'info'">
-                    {{ row.status ? '已完成' : '学习中' }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column prop="completeTime" label="完成时间" width="160" />
-            </el-table>
-          </el-card>
-        </el-col>
-      </el-row>
+            <a-table
+              :data="learningRecords"
+              :pagination="false"
+              row-key="courseName"
+            >
+              <template #columns>
+                <a-table-column title="课程名称" data-index="courseName" :width="200" />
+                <a-table-column title="进度" :width="180" align="center">
+                  <template #cell="{ record }">
+                    <div class="progress-container">
+                      <a-progress :percent="record.progress" :stroke-width="10" :show-text="false" />
+                      <span class="progress-text">{{ record.progress }}%</span>
+                    </div>
+                  </template>
+                </a-table-column>
+                <a-table-column title="观看时长" data-index="watchTime" :width="120" align="center" />
+                <a-table-column title="状态" :width="120" align="center">
+                  <template #cell="{ record }">
+                    <a-tag :color="record.status ? 'green' : 'blue'">{{ record.status ? '已完成' : '学习中' }}</a-tag>
+                  </template>
+                </a-table-column>
+                <a-table-column title="完成时间" data-index="completeTime" :width="160" />
+              </template>
+            </a-table>
+          </a-card>
+        </a-col>
+      </a-row>
     </div>
   </div>
 </template>
@@ -139,14 +151,14 @@ const learningRecords = ref([
   { courseName: '学习方法指导', progress: 75, watchTime: '3小时00分', status: 0, completeTime: '' }
 ])
 
-function getLevelType(level: number): string {
-  const typeMap: Record<number, string> = {
-    1: 'info',
+function getLevelColor(level: number): string {
+  const colorMap: Record<number, string> = {
+    1: 'blue',
     2: 'primary',
-    3: 'warning',
-    4: 'danger'
+    3: 'orange',
+    4: 'red'
   }
-  return typeMap[level] || 'info'
+  return colorMap[level] || 'blue'
 }
 
 function getLevelText(level: number): string {
@@ -185,7 +197,7 @@ onMounted(() => {
     line-height: 1.6;
 
     strong {
-      color: #606266;
+      color: var(--arco-text-color-2);
       margin-right: 8px;
     }
   }
@@ -193,20 +205,32 @@ onMounted(() => {
 
 .stat-item {
   padding: 20px;
-  background: #f5f7fa;
+  background: var(--arco-bg-color-2);
   border-radius: 8px;
   text-align: center;
 
   .stat-value {
     font-size: 24px;
     font-weight: bold;
-    color: #333;
+    color: var(--arco-text-color-1);
     margin-bottom: 4px;
   }
 
   .stat-label {
     font-size: 12px;
-    color: #909399;
+    color: var(--arco-text-color-3);
+  }
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  .progress-text {
+    font-size: 14px;
+    color: var(--arco-text-color-1);
+    min-width: 40px;
   }
 }
 </style>

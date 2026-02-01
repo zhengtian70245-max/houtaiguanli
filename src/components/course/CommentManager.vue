@@ -2,186 +2,200 @@
   <div class="comment-manager">
     <!-- 操作栏 -->
     <div class="comment-actions">
-      <el-button @click="handleBatchDelete" :disabled="selectedCommentIds.length === 0">
-        <el-icon><Delete /></el-icon>
+      <a-button @click="handleBatchDelete" :disabled="selectedCommentIds.length === 0">
+        <template #icon>
+          <icon-delete />
+        </template>
         批量删除
-      </el-button>
-      <el-button @click="handleBatchApprove" :disabled="selectedCommentIds.length === 0">
-        <el-icon><Check /></el-icon>
+      </a-button>
+      <a-button @click="handleBatchApprove" :disabled="selectedCommentIds.length === 0">
+        <template #icon>
+          <icon-check />
+        </template>
         批量审核通过
-      </el-button>
-      <el-button @click="handleRefresh">
-        <el-icon><Refresh /></el-icon>
+      </a-button>
+      <a-button @click="handleRefresh">
+        <template #icon>
+          <icon-refresh />
+        </template>
         刷新
-      </el-button>
+      </a-button>
     </div>
 
     <!-- 搜索筛选 -->
-    <el-form :inline="true" :model="searchForm" class="search-form">
-      <el-form-item label="评论内容">
-        <el-input v-model="searchForm.content" placeholder="请输入评论内容" clearable />
-      </el-form-item>
-      <el-form-item label="评论用户">
-        <el-input v-model="searchForm.userName" placeholder="请输入评论用户" clearable />
-      </el-form-item>
-      <el-form-item label="评论状态">
-        <el-select v-model="searchForm.status" placeholder="请选择评论状态" clearable>
-          <el-option label="全部" :value="-1" />
-          <el-option label="已审核" :value="1" />
-          <el-option label="待审核" :value="0" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="评分">
-        <el-select v-model="searchForm.rating" placeholder="请选择评分" clearable>
-          <el-option label="全部" :value="0" />
-          <el-option label="5星" :value="5" />
-          <el-option label="4星" :value="4" />
-          <el-option label="3星" :value="3" />
-          <el-option label="2星" :value="2" />
-          <el-option label="1星" :value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="handleSearch">搜索</el-button>
-        <el-button @click="handleReset">重置</el-button>
-      </el-form-item>
-    </el-form>
+    <a-form :inline="true" :model="searchForm" class="search-form">
+      <a-form-item label="评论内容">
+        <a-input v-model="searchForm.content" placeholder="请输入评论内容" allow-clear />
+      </a-form-item>
+      <a-form-item label="评论用户">
+        <a-input v-model="searchForm.userName" placeholder="请输入评论用户" allow-clear />
+      </a-form-item>
+      <a-form-item label="评论状态">
+        <a-select v-model="searchForm.status" placeholder="请选择评论状态" allow-clear>
+          <a-option label="全部" :value="-1" />
+          <a-option label="已审核" :value="1" />
+          <a-option label="待审核" :value="0" />
+        </a-select>
+      </a-form-item>
+      <a-form-item label="评分">
+        <a-select v-model="searchForm.rating" placeholder="请选择评分" allow-clear>
+          <a-option label="全部" :value="0" />
+          <a-option label="5星" :value="5" />
+          <a-option label="4星" :value="4" />
+          <a-option label="3星" :value="3" />
+          <a-option label="2星" :value="2" />
+          <a-option label="1星" :value="1" />
+        </a-select>
+      </a-form-item>
+      <a-form-item>
+        <a-button type="primary" @click="handleSearch">搜索</a-button>
+        <a-button @click="handleReset">重置</a-button>
+      </a-form-item>
+    </a-form>
 
     <!-- 评论列表 -->
-    <el-table
-      v-loading="loading"
+    <a-table
+      :loading="loading"
       :data="filteredComments"
       style="width: 100%"
       border
-      stripe
-      @selection-change="handleSelectionChange"
+      @select="handleSelect"
+      @select-all="handleSelectAll"
     >
-      <el-table-column type="selection" width="55" />
-      <el-table-column label="评论用户" min-width="150">
-        <template #default="{ row }">
+      <a-table-column type="selection" width="55" />
+      <a-table-column label="评论用户" min-width="150">
+        <template #cell="{ record }">
           <div class="comment-user">
-            <div class="user-avatar" v-if="row.avatar">
-              <img :src="row.avatar" alt="用户头像" />
+            <div class="user-avatar" v-if="record.avatar">
+              <img :src="record.avatar" alt="用户头像" />
             </div>
             <div class="user-avatar placeholder" v-else>
-              <el-icon><UserFilled /></el-icon>
+              <a-icon name="user" />
             </div>
             <div class="user-info">
-              <div class="user-name">{{ row.userName }}</div>
-              <div class="user-id">ID: {{ row.userId }}</div>
+              <div class="user-name">{{ record.userName }}</div>
+              <div class="user-id">ID: {{ record.userId }}</div>
             </div>
           </div>
         </template>
-      </el-table-column>
-      <el-table-column label="评论内容" min-width="300">
-        <template #default="{ row }">
+      </a-table-column>
+      <a-table-column label="评论内容" min-width="300">
+        <template #cell="{ record }">
           <div class="comment-content">
-            <div class="content-text">{{ row.content }}</div>
+            <div class="content-text">{{ record.content }}</div>
             <div class="content-meta">
               <div class="rating">
-                <el-rate v-model="row.rating" :disabled="true" />
+                <a-rate v-model="record.rating" :disabled="true" :size="14" />
               </div>
-              <div class="create-time">{{ row.createTime }}</div>
+              <div class="create-time">{{ record.createTime }}</div>
             </div>
           </div>
         </template>
-      </el-table-column>
-      <el-table-column label="回复内容" min-width="200">
-        <template #default="{ row }">
-          <div class="reply-content" v-if="row.reply">
-            {{ row.reply }}
+      </a-table-column>
+      <a-table-column label="回复内容" min-width="200">
+        <template #cell="{ record }">
+          <div class="reply-content" v-if="record.reply">
+            {{ record.reply }}
           </div>
           <div class="reply-content empty" v-else>
             暂无回复
           </div>
         </template>
-      </el-table-column>
-      <el-table-column prop="status" label="状态" width="100" align="center">
-        <template #default="{ row }">
-          <el-tag :type="row.status ? 'success' : 'warning'">
-            {{ row.status ? '已审核' : '待审核' }}
-          </el-tag>
+      </a-table-column>
+      <a-table-column label="状态" width="100" align="center">
+        <template #cell="{ record }">
+          <a-tag :type="record.status ? 'success' : 'warning'">
+            {{ record.status ? '已审核' : '待审核' }}
+          </a-tag>
         </template>
-      </el-table-column>
-      <el-table-column label="操作" width="200" align="center">
-        <template #default="{ row }">
-          <el-button size="small" @click="handleReply(row)">
-            <el-icon><ChatLineRound /></el-icon>
+      </a-table-column>
+      <a-table-column label="操作" width="200" align="center">
+        <template #cell="{ record }">
+          <a-button size="small" @click="handleReply(record)">
+            <template #icon>
+              <icon-message />
+            </template>
             回复
-          </el-button>
-          <el-button size="small" :type="row.status ? 'info' : 'success'" @click="handleToggleStatus(row)">
-            <el-icon>{{ row.status ? 'Close' : 'Check' }}</el-icon>
-            {{ row.status ? '取消审核' : '审核通过' }}
-          </el-button>
-          <el-button size="small" type="danger" @click="handleDelete(row)">
-            <el-icon><Delete /></el-icon>
+          </a-button>
+          <a-button size="small" :type="record.status ? 'info' : 'success'" @click="handleToggleStatus(record)">
+            <template #icon>
+              <a-icon :name="record.status ? 'close' : 'check'" />
+            </template>
+            {{ record.status ? '取消审核' : '审核通过' }}
+          </a-button>
+          <a-button size="small" type="danger" @click="handleDelete(record)">
+            <template #icon>
+              <icon-delete />
+            </template>
             删除
-          </el-button>
+          </a-button>
         </template>
-      </el-table-column>
-    </el-table>
+      </a-table-column>
+    </a-table>
 
     <!-- 分页 -->
     <div class="pagination-wrapper">
-      <el-pagination
-        v-model:current-page="pagination.page"
+      <a-pagination
+        v-model:current="pagination.page"
         v-model:page-size="pagination.size"
-        :page-sizes="[10, 20, 50, 100]"
-        layout="total, sizes, prev, pager, next, jumper"
+        :page-size-options="[10, 20, 50, 100]"
         :total="filteredComments.length"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
+        show-total
+        show-jumper
+        show-size-changer
+        @page-size-change="handleSizeChange"
+        @page-change="handleCurrentChange"
       />
     </div>
 
     <!-- 回复评论对话框 -->
-    <el-dialog
-      v-model="replyDialogVisible"
+    <a-modal
+      v-model:visible="replyDialogVisible"
       title="回复评论"
       width="500px"
     >
-      <el-form :model="replyForm" label-width="80px">
-        <el-form-item label="评论用户">
-          <el-input v-model="replyForm.userName" disabled />
-        </el-form-item>
-        <el-form-item label="评论内容">
-          <el-input
+      <a-form :model="replyForm" label-width="80px">
+        <a-form-item label="评论用户">
+          <a-input v-model="replyForm.userName" :disabled="true" />
+        </a-form-item>
+        <a-form-item label="评论内容">
+          <a-input
             v-model="replyForm.content"
             type="textarea"
             :rows="3"
-            disabled
+            :disabled="true"
           />
-        </el-form-item>
-        <el-form-item label="回复内容">
-          <el-input
+        </a-form-item>
+        <a-form-item label="回复内容">
+          <a-input
             v-model="replyForm.reply"
             type="textarea"
             :rows="4"
             placeholder="请输入回复内容"
           />
-        </el-form-item>
-      </el-form>
+        </a-form-item>
+      </a-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="replyDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleConfirmReply">确定回复</el-button>
+          <a-button @click="replyDialogVisible = false">取消</a-button>
+          <a-button type="primary" @click="handleConfirmReply">确定回复</a-button>
         </span>
       </template>
-    </el-dialog>
+    </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { Message, Modal } from '@arco-design/web-vue'
 import {
-  Delete,
-  Check,
-  Refresh,
-  ChatLineRound,
-  Close,
-  UserFilled
-} from '@element-plus/icons-vue'
+  IconDelete,
+  IconCheck,
+  IconRefresh,
+  IconMessage,
+  IconClose,
+  IconUser
+} from '@arco-design/web-vue/es/icon'
 
 const props = defineProps<{
   course: any
@@ -294,27 +308,37 @@ const filteredComments = computed(() => {
 })
 
 // 选择评论
-function handleSelectionChange(selection: any[]) {
-  selectedCommentIds.value = selection.map(item => item.id)
+function handleSelect(selection: any[], record: any, selected: boolean) {
+  if (selected) {
+    selectedCommentIds.value.push(record.id)
+  } else {
+    selectedCommentIds.value = selectedCommentIds.value.filter(id => id !== record.id)
+  }
+}
+
+function handleSelectAll(selection: any[], selected: boolean) {
+  if (selected) {
+    selectedCommentIds.value = selection.map(item => item.id)
+  } else {
+    selectedCommentIds.value = []
+  }
 }
 
 // 批量删除
 function handleBatchDelete() {
-  ElMessageBox.confirm(
-    `确定要删除选中的${selectedCommentIds.value.length}条评论吗？`,
-    '批量删除',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'danger'
+  Modal.confirm({
+    title: '批量删除',
+    content: `确定要删除选中的${selectedCommentIds.value.length}条评论吗？`,
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      mockComments.value = mockComments.value.filter(
+        (comment: any) => !selectedCommentIds.value.includes(comment.id)
+      )
+      selectedCommentIds.value = []
+      Message.success('批量删除成功')
     }
-  ).then(() => {
-    mockComments.value = mockComments.value.filter(
-      (comment: any) => !selectedCommentIds.value.includes(comment.id)
-    )
-    selectedCommentIds.value = []
-    ElMessage.success('批量删除成功')
-  }).catch(() => {})
+  })
 }
 
 // 批量审核通过
@@ -326,18 +350,18 @@ function handleBatchApprove() {
     return comment
   })
   selectedCommentIds.value = []
-  ElMessage.success('批量审核通过成功')
+  Message.success('批量审核通过成功')
 }
 
 // 刷新
 function handleRefresh() {
-  ElMessage.success('刷新成功')
+  Message.success('刷新成功')
 }
 
 // 搜索
 function handleSearch() {
   pagination.page = 1
-  ElMessage.success('搜索成功')
+  Message.success('搜索成功')
 }
 
 // 重置
@@ -347,7 +371,7 @@ function handleReset() {
   searchForm.status = -1
   searchForm.rating = 0
   pagination.page = 1
-  ElMessage.success('重置成功')
+  Message.success('重置成功')
 }
 
 // 回复评论
@@ -362,31 +386,29 @@ function handleReply(comment: any) {
 // 切换评论状态
 function handleToggleStatus(comment: any) {
   comment.status = !comment.status
-  ElMessage.success(comment.status ? '审核通过成功' : '取消审核成功')
+  Message.success(comment.status ? '审核通过成功' : '取消审核成功')
 }
 
 // 删除评论
 function handleDelete(comment: any) {
-  ElMessageBox.confirm(
-    '确定要删除这条评论吗？',
-    '删除评论',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'danger'
+  Modal.confirm({
+    title: '删除评论',
+    content: '确定要删除这条评论吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      mockComments.value = mockComments.value.filter(
+        (c: any) => c.id !== comment.id
+      )
+      Message.success('删除成功')
     }
-  ).then(() => {
-    mockComments.value = mockComments.value.filter(
-      (c: any) => c.id !== comment.id
-    )
-    ElMessage.success('删除成功')
-  }).catch(() => {})
+  })
 }
 
 // 确认回复
 function handleConfirmReply() {
   if (!replyForm.reply) {
-    ElMessage.error('请输入回复内容')
+    Message.error('请输入回复内容')
     return
   }
   
@@ -398,7 +420,7 @@ function handleConfirmReply() {
   })
   
   replyDialogVisible.value = false
-  ElMessage.success('回复成功')
+  Message.success('回复成功')
 }
 
 // 分页变化
@@ -448,7 +470,7 @@ function handleCurrentChange(page: number) {
       justify-content: center;
       color: #909399;
 
-      .el-icon {
+      .arco-icon {
         font-size: 24px;
       }
     }
@@ -480,8 +502,8 @@ function handleCurrentChange(page: number) {
       color: #909399;
 
       .rating {
-        .el-rate {
-          --el-rate-icon-size: 14px;
+        .arco-rate {
+          --arco-rate-icon-size: 14px;
         }
       }
     }

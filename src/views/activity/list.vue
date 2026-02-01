@@ -2,79 +2,95 @@
   <div class="page-container">
     <div class="page-header">
       <h2>活动列表</h2>
-      <el-button type="primary" @click="handleAdd">添加活动</el-button>
+      <a-button type="primary" @click="handleAdd">添加活动</a-button>
     </div>
     <div class="page-content">
-      <el-form :inline="true" :model="queryForm" class="search-form">
-        <el-form-item label="活动标题">
-          <el-input v-model="queryForm.title" placeholder="请输入活动标题" clearable />
-        </el-form-item>
-        <el-form-item label="活动类型">
-          <el-select v-model="queryForm.type" placeholder="请选择活动类型" clearable>
-            <el-option label="全部" :value="0" />
-            <el-option label="读书会" :value="1" />
-            <el-option label="研修班" :value="2" />
-            <el-option label="训练营" :value="3" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="queryForm.status" placeholder="请选择状态" clearable>
-            <el-option label="全部" :value="-1" />
-            <el-option label="进行中" :value="1" />
-            <el-option label="已结束" :value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
+      <a-card class="search-card" :bordered="false">
+        <a-form :model="queryForm" layout="inline">
+          <a-form-item label="活动标题">
+            <a-input v-model="queryForm.title" placeholder="请输入活动标题" allow-clear />
+          </a-form-item>
+          <a-form-item label="活动类型">
+            <a-select v-model="queryForm.type" placeholder="请选择活动类型" allow-clear>
+              <a-option label="全部" :value="0" />
+              <a-option label="读书会" :value="1" />
+              <a-option label="研修班" :value="2" />
+              <a-option label="训练营" :value="3" />
+            </a-select>
+          </a-form-item>
+          <a-form-item label="状态">
+            <a-select v-model="queryForm.status" placeholder="请选择状态" allow-clear>
+              <a-option label="全部" :value="-1" />
+              <a-option label="进行中" :value="1" />
+              <a-option label="已结束" :value="0" />
+            </a-select>
+          </a-form-item>
+          <a-form-item>
+            <a-space>
+              <a-button type="primary" @click="handleSearch">搜索</a-button>
+              <a-button @click="handleReset">重置</a-button>
+            </a-space>
+          </a-form-item>
+        </a-form>
+      </a-card>
 
-      <el-table :data="tableData" style="width: 100%" border stripe>
-        <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="title" label="活动标题" min-width="200" />
-        <el-table-column prop="type" label="活动类型" width="120" align="center">
-          <template #default="{ row }">
-            <el-tag v-if="row.type === 1">读书会</el-tag>
-            <el-tag v-else-if="row.type === 2">研修班</el-tag>
-            <el-tag v-else-if="row.type === 3">训练营</el-tag>
+      <a-card class="table-card" :bordered="false">
+        <a-table
+          :data="tableData"
+          :loading="loading"
+          :pagination="false"
+          row-key="id"
+        >
+          <template #columns>
+            <a-table-column title="ID" data-index="id" :width="80" align="center" />
+            <a-table-column title="活动标题" data-index="title" :min-width="200" />
+            <a-table-column title="活动类型" :width="120" align="center">
+              <template #cell="{ record }">
+                <a-tag>
+                  {{ record.type === 1 ? '读书会' : record.type === 2 ? '研修班' : '训练营' }}
+                </a-tag>
+              </template>
+            </a-table-column>
+            <a-table-column title="活动日期" data-index="date" :width="130" />
+            <a-table-column title="地点" data-index="location" :width="120" />
+            <a-table-column title="价格" :width="100" align="right">
+              <template #cell="{ record }">
+                ¥{{ record.price.toFixed(2) }}
+              </template>
+            </a-table-column>
+            <a-table-column title="状态" :width="100" align="center">
+              <template #cell="{ record }">
+                <a-tag :color="record.status ? 'green' : 'red'">
+                  {{ record.status ? '进行中' : '已结束' }}
+                </a-tag>
+              </template>
+            </a-table-column>
+            <a-table-column title="报名人数" data-index="registrationCount" :width="120" align="center" />
+            <a-table-column title="操作" :width="200" align="center">
+              <template #cell="{ record }">
+                <a-space>
+                  <a-button type="primary" size="small" @click="handleEdit(record)">编辑</a-button>
+                  <a-button type="success" size="small" @click="viewRegistration(record)">查看报名</a-button>
+                </a-space>
+              </template>
+            </a-table-column>
           </template>
-        </el-table-column>
-        <el-table-column prop="date" label="活动日期" width="130" />
-        <el-table-column prop="location" label="地点" width="120" />
-        <el-table-column prop="price" label="价格" width="100" align="right">
-          <template #default="{ row }">
-            ¥{{ row.price.toFixed(2) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.status ? 'success' : 'danger'">
-              {{ row.status ? '进行中' : '已结束' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="registrationCount" label="报名人数" width="120" align="center" />
-        <el-table-column label="操作" width="200" align="center">
-          <template #default="{ row }">
-            <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button type="success" size="small" @click="viewRegistration(row)">查看报名</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+        </a-table>
 
-      <div class="pagination-wrapper">
-        <el-pagination
-          v-model:current-page="pagination.page"
-          v-model="pagination.page"
-          :page-size="pagination.size"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="pagination.total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
+        <div class="pagination-wrapper">
+          <a-pagination
+            v-model:current="pagination.page"
+            v-model:page-size="pagination.size"
+            :total="pagination.total"
+            :show-total="true"
+            :show-jumper="true"
+            :show-page-size="true"
+            :page-size-options="[10, 20, 50, 100]"
+            @change="handleCurrentChange"
+            @page-size-change="handleSizeChange"
+          />
+        </div>
+      </a-card>
     </div>
   </div>
 </template>
@@ -82,7 +98,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { Message } from '@arco-design/web-vue'
 
 const router = useRouter()
 const loading = ref(false)
@@ -169,8 +185,14 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
-.search-form {
+.search-card {
   margin-bottom: 20px;
+}
+
+.table-card {
+  :deep(.arco-table-th) {
+    font-weight: 600;
+  }
 }
 
 .pagination-wrapper {

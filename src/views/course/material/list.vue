@@ -2,80 +2,68 @@
   <div class="page-container">
     <div class="page-header">
       <h2>素材库</h2>
-      <el-button type="primary" @click="handleAdd">添加素材</el-button>
+      <a-button type="primary" @click="handleAdd">添加素材</a-button>
     </div>
     <div class="page-content">
-      <el-form :inline="true" :model="queryForm" class="search-form">
-        <el-form-item label="素材名称">
-          <el-input v-model="queryForm.name" placeholder="请输入素材名称" clearable />
-        </el-form-item>
-        <el-form-item label="素材类型">
-          <el-select v-model="queryForm.type" placeholder="请选择素材类型" clearable>
-            <el-option label="全部" :value="0" />
-            <el-option label="视频" :value="1" />
-            <el-option label="音频" :value="2" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="queryForm.status" placeholder="请选择状态" clearable>
-            <el-option label="全部" :value="-1" />
-            <el-option label="可用" :value="1" />
-            <el-option label="禁用" :value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
+      <a-form :model="queryForm" inline class="search-form">
+        <a-form-item label="素材名称">
+          <a-input v-model="queryForm.name" placeholder="请输入素材名称" allow-clear />
+        </a-form-item>
+        <a-form-item label="素材类型">
+          <a-select v-model="queryForm.type" placeholder="请选择素材类型" allow-clear>
+            <a-option label="全部" :value="0" />
+            <a-option label="视频" :value="1" />
+            <a-option label="音频" :value="2" />
+          </a-select>
+        </a-form-item>
+        <a-form-item label="状态">
+          <a-select v-model="queryForm.status" placeholder="请选择状态" allow-clear>
+            <a-option label="全部" :value="-1" />
+            <a-option label="可用" :value="1" />
+            <a-option label="禁用" :value="0" />
+          </a-select>
+        </a-form-item>
+        <a-form-item>
+          <a-button type="primary" @click="handleSearch">搜索</a-button>
+          <a-button @click="handleReset">重置</a-button>
+        </a-form-item>
+      </a-form>
 
-      <el-table :data="tableData" style="width: 100%" border stripe>
-        <el-table-column prop="id" label="ID" width="80" align="center" />
-        <el-table-column prop="name" label="素材名称" min-width="200" />
-        <el-table-column prop="type" label="素材类型" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag v-if="row.type === 1" type="info">视频</el-tag>
-            <el-tag v-else-if="row.type === 2" type="success">音频</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="size" label="文件大小" width="120" align="right">
-          <template #default="{ row }">
-            {{ formatFileSize(row.size) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="duration" label="时长" width="120" align="center">
-          <template #default="{ row }">
-            {{ formatDuration(row.duration) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.status ? 'success' : 'danger'">
-              {{ row.status ? '可用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="上传时间" width="160" />
-        <el-table-column label="操作" width="200" align="center">
-          <template #default="{ row }">
-            <el-button type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button type="warning" size="small" @click="handlePreview(row)">预览</el-button>
-            <el-button v-if="row.status" type="info" size="small" @click="handleDisable(row)">禁用</el-button>
-            <el-button v-else type="success" size="small" @click="handleEnable(row)">启用</el-button>
-            <el-button type="danger" size="small" @click="handleDelete(row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <a-table :data="tableData" :loading="loading" :columns="columns" :pagination="false" bordered>
+        <template #column:type="{ record }">
+          <a-tag v-if="record.type === 1" color="blue">视频</a-tag>
+          <a-tag v-else-if="record.type === 2" color="green">音频</a-tag>
+        </template>
+        <template #column:size="{ record }">
+          {{ formatFileSize(record.size) }}
+        </template>
+        <template #column:duration="{ record }">
+          {{ formatDuration(record.duration) }}
+        </template>
+        <template #column:status="{ record }">
+          <a-tag :color="record.status ? 'green' : 'red'">
+            {{ record.status ? '可用' : '禁用' }}
+          </a-tag>
+        </template>
+        <template #column:action="{ record }">
+          <a-button type="primary" size="small" @click="handleEdit(record)">编辑</a-button>
+          <a-button type="default" size="small" @click="handlePreview(record)">预览</a-button>
+          <a-button v-if="record.status" type="default" size="small" @click="handleDisable(record)">禁用</a-button>
+          <a-button v-else type="success" size="small" @click="handleEnable(record)">启用</a-button>
+          <a-button type="danger" size="small" @click="handleDelete(record)">删除</a-button>
+        </template>
+      </a-table>
 
       <div class="pagination-wrapper">
-        <el-pagination
-          v-model:current-page="pagination.page"
+        <a-pagination
+          v-model:current="pagination.page"
           v-model:page-size="pagination.size"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
+          :page-size-options="['10', '20', '50', '100']"
+          show-size-changer
+          show-total
           :total="pagination.total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+          @change="handleCurrentChange"
+          @page-size-change="handleSizeChange"
         />
       </div>
     </div>
@@ -83,10 +71,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { mockDataService } from '@/api/mock'
+import message from '@arco-design/web-vue/es/message'
+import Modal from '@arco-design/web-vue/es/modal'
+import {
+  IconPlus,
+  IconEdit,
+  IconEye,
+  IconVideoCamera,
+  IconAudio,
+  IconDelete
+} from '@arco-design/web-vue/es/icon'
 
 const router = useRouter()
 const loading = ref(false)
@@ -104,6 +100,56 @@ const pagination = reactive({
 })
 
 const tableData = ref<any[]>([])
+
+const columns = computed(() => [
+  {
+    title: 'ID',
+    dataIndex: 'id',
+    width: 80,
+    align: 'center'
+  },
+  {
+    title: '素材名称',
+    dataIndex: 'name',
+    minWidth: 200
+  },
+  {
+    title: '素材类型',
+    dataIndex: 'type',
+    width: 100,
+    align: 'center'
+  },
+  {
+    title: '文件大小',
+    dataIndex: 'size',
+    width: 120,
+    align: 'right'
+  },
+  {
+    title: '时长',
+    dataIndex: 'duration',
+    width: 120,
+    align: 'center'
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    width: 100,
+    align: 'center'
+  },
+  {
+    title: '上传时间',
+    dataIndex: 'createTime',
+    width: 160
+  },
+  {
+    title: '操作',
+    dataIndex: 'action',
+    width: 200,
+    align: 'center',
+    fixed: 'right'
+  }
+])
 
 // 格式化文件大小
 function formatFileSize(bytes: number): string {
@@ -152,14 +198,34 @@ async function fetchData() {
           url: 'https://example.com/audio1.mp3',
           status: 1,
           createTime: '2026-01-02 14:30:00'
+        },
+        {
+          id: 3,
+          name: '课程讲解视频2',
+          type: 1,
+          size: 1024 * 1024 * 80, // 80MB
+          duration: 900, // 15分钟
+          url: 'https://example.com/video2.mp4',
+          status: 1,
+          createTime: '2026-01-03 09:00:00'
+        },
+        {
+          id: 4,
+          name: '音频讲解2',
+          type: 2,
+          size: 1024 * 1024 * 15, // 15MB
+          duration: 450, // 7.5分钟
+          url: 'https://example.com/audio2.mp3',
+          status: 0,
+          createTime: '2026-01-04 16:00:00'
         }
       ],
-      total: 2
+      total: 4
     }
     tableData.value = result.list
     pagination.total = result.total
   } catch (error) {
-    ElMessage.error('获取数据失败')
+    message.error('获取数据失败')
   } finally {
     loading.value = false
   }
@@ -199,52 +265,58 @@ function handleEdit(row: any) {
 
 function handlePreview(row: any) {
   // 预览素材
-  ElMessageBox.alert(
-    `<div style="text-align: center;">
-      <h3>${row.name}</h3>
-      <p>类型: ${row.type === 1 ? '视频' : '音频'}</p>
-      <p>大小: ${formatFileSize(row.size)}</p>
-      <p>时长: ${formatDuration(row.duration)}</p>
-      <p>URL: ${row.url}</p>
-    </div>`,
-    '素材预览',
-    {
-      dangerouslyUseHTMLString: true
-    }
-  )
+  Modal.info({
+    title: '素材预览',
+    content: `
+      <div style="text-align: center;">
+        <h3>${row.name}</h3>
+        <p>类型: ${row.type === 1 ? '视频' : '音频'}</p>
+        <p>大小: ${formatFileSize(row.size)}</p>
+        <p>时长: ${formatDuration(row.duration)}</p>
+        <p>URL: ${row.url}</p>
+      </div>
+    `,
+    showCancel: false
+  })
 }
 
 function handleDisable(row: any) {
-  ElMessage.confirm('确定要禁用该素材吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    row.status = 0
-    ElMessage.success('禁用成功')
-  }).catch(() => {})
+  Modal.confirm({
+    title: '操作确认',
+    content: '确定要禁用该素材吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      row.status = 0
+      message.success('禁用成功')
+    }
+  })
 }
 
 function handleEnable(row: any) {
-  ElMessage.confirm('确定要启用该素材吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    row.status = 1
-    ElMessage.success('启用成功')
-  }).catch(() => {})
+  Modal.confirm({
+    title: '操作确认',
+    content: '确定要启用该素材吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      row.status = 1
+      message.success('启用成功')
+    }
+  })
 }
 
 function handleDelete(row: any) {
-  ElMessage.confirm('确定要删除该素材吗？', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    ElMessage.success('删除成功')
-    fetchData()
-  }).catch(() => {})
+  Modal.confirm({
+    title: '操作确认',
+    content: '确定要删除该素材吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      message.success('删除成功')
+      fetchData()
+    }
+  })
 }
 
 onMounted(() => {

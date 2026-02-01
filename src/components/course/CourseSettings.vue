@@ -1,110 +1,110 @@
 <template>
   <div class="course-settings">
     <!-- 设置选项卡 -->
-    <el-tabs v-model="activeSettingTab" class="settings-tabs">
-      <el-tab-pane label="基础设置" name="basic">
-        <el-form :model="settingsForm.basic" label-width="120px" class="settings-form">
-          <el-form-item label="课程简介">
-            <el-input
+    <a-tabs v-model:activeKey="activeSettingTab" class="settings-tabs">
+      <a-tab-pane key="basic" title="基础设置">
+        <a-form :model="settingsForm.basic" label-width="120px" class="settings-form">
+          <a-form-item label="课程简介">
+            <a-input
               v-model="settingsForm.basic.intro"
               type="textarea"
               :rows="4"
               placeholder="请输入课程简介"
             />
-          </el-form-item>
-          <el-form-item label="课程详情">
-            <el-input
+          </a-form-item>
+          <a-form-item label="课程详情">
+            <a-input
               v-model="settingsForm.basic.detail"
               type="textarea"
               :rows="8"
               placeholder="请输入课程详情"
             />
-          </el-form-item>
-          <el-form-item label="课程标签">
-            <el-tag
+          </a-form-item>
+          <a-form-item label="课程标签">
+            <a-tag
               v-for="(tag, index) in settingsForm.basic.tags"
               :key="index"
-              closable
+              :closable="true"
               @close="handleRemoveTag(index)"
             >
               {{ tag }}
-            </el-tag>
-            <el-input
+            </a-tag>
+            <a-input
               v-model="newTag"
               class="tag-input"
               placeholder="输入标签后按回车"
               @keyup.enter="handleAddTag"
             />
-          </el-form-item>
-          <el-form-item label="SEO标题">
-            <el-input v-model="settingsForm.basic.seoTitle" placeholder="请输入SEO标题" />
-          </el-form-item>
-          <el-form-item label="SEO关键词">
-            <el-input v-model="settingsForm.basic.seoKeywords" placeholder="请输入SEO关键词，多个用逗号分隔" />
-          </el-form-item>
-          <el-form-item label="SEO描述">
-            <el-input
+          </a-form-item>
+          <a-form-item label="SEO标题">
+            <a-input v-model="settingsForm.basic.seoTitle" placeholder="请输入SEO标题" />
+          </a-form-item>
+          <a-form-item label="SEO关键词">
+            <a-input v-model="settingsForm.basic.seoKeywords" placeholder="请输入SEO关键词，多个用逗号分隔" />
+          </a-form-item>
+          <a-form-item label="SEO描述">
+            <a-input
               v-model="settingsForm.basic.seoDescription"
               type="textarea"
               :rows="3"
               placeholder="请输入SEO描述"
             />
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
+          </a-form-item>
+        </a-form>
+      </a-tab-pane>
 
-      <el-tab-pane label="价格设置" name="price">
-        <el-form :model="settingsForm.price" label-width="120px" class="settings-form">
-          <el-form-item label="课程价格">
-            <el-input-number
+      <a-tab-pane key="price" title="价格设置">
+        <a-form :model="settingsForm.price" label-width="120px" class="settings-form">
+          <a-form-item label="课程价格">
+            <a-input-number
               v-model="settingsForm.price.price"
               :min="0"
               :precision="2"
               :step="0.01"
               placeholder="请输入价格"
             />
-          </el-form-item>
-          <el-form-item label="原价">
-            <el-input-number
+          </a-form-item>
+          <a-form-item label="原价">
+            <a-input-number
               v-model="settingsForm.price.originalPrice"
               :min="0"
               :precision="2"
               :step="0.01"
               placeholder="请输入原价"
             />
-          </el-form-item>
-          <el-form-item label="会员价格">
-            <el-input-number
+          </a-form-item>
+          <a-form-item label="会员价格">
+            <a-input-number
               v-model="settingsForm.price.vipPrice"
               :min="0"
               :precision="2"
               :step="0.01"
               placeholder="请输入会员价格"
             />
-          </el-form-item>
-          <el-form-item label="所需会员等级">
-            <el-select v-model="settingsForm.price.vipLevelRequired" placeholder="请选择所需会员等级">
-              <el-option label="无限制" :value="0" />
-              <el-option label="付费学员" :value="1" />
-              <el-option label="终身学员" :value="2" />
-              <el-option label="架构学套餐学员" :value="3" />
-              <el-option label="全家福套餐学员" :value="4" />
-              <el-option label="自动自发家族成员" :value="5" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="是否参与会员免费">
-            <el-switch v-model="settingsForm.price.includeInVip" />
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
+          </a-form-item>
+          <a-form-item label="所需会员等级">
+            <a-select v-model="settingsForm.price.vipLevelRequired" placeholder="请选择所需会员等级">
+              <a-option label="无限制" :value="0" />
+              <a-option label="付费学员" :value="1" />
+              <a-option label="终身学员" :value="2" />
+              <a-option label="架构学套餐学员" :value="3" />
+              <a-option label="全家福套餐学员" :value="4" />
+              <a-option label="自动自发家族成员" :value="5" />
+            </a-select>
+          </a-form-item>
+          <a-form-item label="是否参与会员免费">
+            <a-switch v-model="settingsForm.price.includeInVip" />
+          </a-form-item>
+        </a-form>
+      </a-tab-pane>
 
-      <el-tab-pane label="销售设置" name="sales">
-        <el-form :model="settingsForm.sales" label-width="120px" class="settings-form">
-          <el-form-item label="是否开启分销">
-            <el-switch v-model="settingsForm.sales.enableDistribution" />
-          </el-form-item>
-          <el-form-item label="分销佣金比例" v-if="settingsForm.sales.enableDistribution">
-            <el-input-number
+      <a-tab-pane key="sales" title="销售设置">
+        <a-form :model="settingsForm.sales" label-width="120px" class="settings-form">
+          <a-form-item label="是否开启分销">
+            <a-switch v-model="settingsForm.sales.enableDistribution" />
+          </a-form-item>
+          <a-form-item label="分销佣金比例" v-if="settingsForm.sales.enableDistribution">
+            <a-input-number
               v-model="settingsForm.sales.distributionRate"
               :min="0"
               :max="100"
@@ -112,17 +112,17 @@
               :step="0.1"
               placeholder="请输入佣金比例"
             >
-              <template #append>%</template>
-            </el-input-number>
-          </el-form-item>
-          <el-form-item label="是否开启优惠券">
-            <el-switch v-model="settingsForm.sales.enableCoupon" />
-          </el-form-item>
-          <el-form-item label="是否开启积分抵扣">
-            <el-switch v-model="settingsForm.sales.enablePoints" />
-          </el-form-item>
-          <el-form-item label="积分抵扣比例" v-if="settingsForm.sales.enablePoints">
-            <el-input-number
+              <template #suffix>%</template>
+            </a-input-number>
+          </a-form-item>
+          <a-form-item label="是否开启优惠券">
+            <a-switch v-model="settingsForm.sales.enableCoupon" />
+          </a-form-item>
+          <a-form-item label="是否开启积分抵扣">
+            <a-switch v-model="settingsForm.sales.enablePoints" />
+          </a-form-item>
+          <a-form-item label="积分抵扣比例" v-if="settingsForm.sales.enablePoints">
+            <a-input-number
               v-model="settingsForm.sales.pointsRate"
               :min="0"
               :max="100"
@@ -130,126 +130,130 @@
               :step="0.1"
               placeholder="请输入积分抵扣比例"
             >
-              <template #append>%</template>
-            </el-input-number>
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
+              <template #suffix>%</template>
+            </a-input-number>
+          </a-form-item>
+        </a-form>
+      </a-tab-pane>
 
-      <el-tab-pane label="关联设置" name="related">
-        <el-form :model="settingsForm.related" label-width="120px" class="settings-form">
-          <el-form-item label="关联商品">
-            <el-select
+      <a-tab-pane key="related" title="关联设置">
+        <a-form :model="settingsForm.related" label-width="120px" class="settings-form">
+          <a-form-item label="关联商品">
+            <a-select
               v-model="settingsForm.related.relatedProducts"
-              multiple
+              :multiple="true"
               placeholder="请选择关联商品"
               class="product-select"
             >
-              <el-option label="商品1" :value="1" />
-              <el-option label="商品2" :value="2" />
-              <el-option label="商品3" :value="3" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="关联课程">
-            <el-select
+              <a-option label="商品1" :value="1" />
+              <a-option label="商品2" :value="2" />
+              <a-option label="商品3" :value="3" />
+            </a-select>
+          </a-form-item>
+          <a-form-item label="关联课程">
+            <a-select
               v-model="settingsForm.related.relatedCourses"
-              multiple
+              :multiple="true"
               placeholder="请选择关联课程"
               class="course-select"
             >
-              <el-option label="课程1" :value="1" />
-              <el-option label="课程2" :value="2" />
-              <el-option label="课程3" :value="3" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="关联电子书">
-            <el-select
+              <a-option label="课程1" :value="1" />
+              <a-option label="课程2" :value="2" />
+              <a-option label="课程3" :value="3" />
+            </a-select>
+          </a-form-item>
+          <a-form-item label="关联电子书">
+            <a-select
               v-model="settingsForm.related.relatedBooks"
-              multiple
+              :multiple="true"
               placeholder="请选择关联电子书"
               class="book-select"
             >
-              <el-option label="电子书1" :value="1" />
-              <el-option label="电子书2" :value="2" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="关联圈子">
-            <el-select
+              <a-option label="电子书1" :value="1" />
+              <a-option label="电子书2" :value="2" />
+            </a-select>
+          </a-form-item>
+          <a-form-item label="关联圈子">
+            <a-select
               v-model="settingsForm.related.relatedCircles"
-              multiple
+              :multiple="true"
               placeholder="请选择关联圈子"
               class="circle-select"
             >
-              <el-option label="圈子1" :value="1" />
-              <el-option label="圈子2" :value="2" />
-            </el-select>
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
+              <a-option label="圈子1" :value="1" />
+              <a-option label="圈子2" :value="2" />
+            </a-select>
+          </a-form-item>
+        </a-form>
+      </a-tab-pane>
 
-      <el-tab-pane label="高级设置" name="advanced">
-        <el-form :model="settingsForm.advanced" label-width="120px" class="settings-form">
-          <el-form-item label="允许评论">
-            <el-switch v-model="settingsForm.advanced.allowComment" />
-          </el-form-item>
-          <el-form-item label="评论审核">
-            <el-switch v-model="settingsForm.advanced.commentAudit" />
-          </el-form-item>
-          <el-form-item label="允许下载">
-            <el-switch v-model="settingsForm.advanced.allowDownload" />
-          </el-form-item>
-          <el-form-item label="学习有效期">
-            <el-select v-model="settingsForm.advanced.validityPeriod" placeholder="请选择学习有效期">
-              <el-option label="永久有效" :value="0" />
-              <el-option label="30天" :value="30" />
-              <el-option label="90天" :value="90" />
-              <el-option label="180天" :value="180" />
-              <el-option label="365天" :value="365" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="最大学习人数">
-            <el-input-number
+      <a-tab-pane key="advanced" title="高级设置">
+        <a-form :model="settingsForm.advanced" label-width="120px" class="settings-form">
+          <a-form-item label="允许评论">
+            <a-switch v-model="settingsForm.advanced.allowComment" />
+          </a-form-item>
+          <a-form-item label="评论审核">
+            <a-switch v-model="settingsForm.advanced.commentAudit" />
+          </a-form-item>
+          <a-form-item label="允许下载">
+            <a-switch v-model="settingsForm.advanced.allowDownload" />
+          </a-form-item>
+          <a-form-item label="学习有效期">
+            <a-select v-model="settingsForm.advanced.validityPeriod" placeholder="请选择学习有效期">
+              <a-option label="永久有效" :value="0" />
+              <a-option label="30天" :value="30" />
+              <a-option label="90天" :value="90" />
+              <a-option label="180天" :value="180" />
+              <a-option label="365天" :value="365" />
+            </a-select>
+          </a-form-item>
+          <a-form-item label="最大学习人数">
+            <a-input-number
               v-model="settingsForm.advanced.maxStudents"
               :min="0"
               :precision="0"
               :step="1"
               placeholder="0表示无限制"
             />
-          </el-form-item>
-          <el-form-item label="课程排序">
-            <el-input-number
+          </a-form-item>
+          <a-form-item label="课程排序">
+            <a-input-number
               v-model="settingsForm.advanced.sort"
               :min="0"
               :precision="0"
               :step="1"
               placeholder="请输入排序值"
             />
-          </el-form-item>
-        </el-form>
-      </el-tab-pane>
-    </el-tabs>
+          </a-form-item>
+        </a-form>
+      </a-tab-pane>
+    </a-tabs>
 
     <!-- 操作按钮 -->
     <div class="settings-actions">
-      <el-button type="primary" @click="handleSaveSettings">
-        <el-icon><Check /></el-icon>
+      <a-button type="primary" @click="handleSaveSettings">
+        <template #icon>
+          <icon-check />
+        </template>
         保存设置
-      </el-button>
-      <el-button @click="handleResetSettings">
-        <el-icon><Refresh /></el-icon>
+      </a-button>
+      <a-button @click="handleResetSettings">
+        <template #icon>
+          <icon-refresh />
+        </template>
         重置
-      </el-button>
+      </a-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, reactive } from 'vue'
+import { Message } from '@arco-design/web-vue'
 import {
-  Check,
-  Refresh
-} from '@element-plus/icons-vue'
+  IconCheck,
+  IconRefresh
+} from '@arco-design/web-vue/es/icon'
 
 const props = defineProps<{
   course: any
@@ -311,7 +315,7 @@ function initSettingsData() {
     // 基础设置
     settingsForm.basic.intro = props.course.intro || ''
     settingsForm.basic.detail = props.course.detail || ''
-    settingsForm.basic.tags = props.course.settings.relatedSettings?.keywords || []
+    settingsForm.basic.tags = [...(props.course.settings.relatedSettings?.keywords || [])]
     settingsForm.basic.seoTitle = props.course.settings.seoTitle || ''
     settingsForm.basic.seoKeywords = props.course.settings.seoKeywords || ''
     settingsForm.basic.seoDescription = props.course.settings.seoDescription || ''
@@ -331,10 +335,10 @@ function initSettingsData() {
     settingsForm.sales.pointsRate = props.course.settings.pointsRate || 0
     
     // 关联设置
-    settingsForm.related.relatedProducts = props.course.settings.relatedSettings?.relatedProducts || []
-    settingsForm.related.relatedCourses = props.course.settings.relatedSettings?.relatedCourses || []
-    settingsForm.related.relatedBooks = props.course.settings.relatedSettings?.relatedBooks || []
-    settingsForm.related.relatedCircles = props.course.settings.relatedSettings?.relatedCircles || []
+    settingsForm.related.relatedProducts = [...(props.course.settings.relatedSettings?.relatedProducts || [])]
+    settingsForm.related.relatedCourses = [...(props.course.settings.relatedSettings?.relatedCourses || [])]
+    settingsForm.related.relatedBooks = [...(props.course.settings.relatedSettings?.relatedBooks || [])]
+    settingsForm.related.relatedCircles = [...(props.course.settings.relatedSettings?.relatedCircles || [])]
     
     // 高级设置
     settingsForm.advanced.allowComment = props.course.settings.allowComment !== false
@@ -398,19 +402,14 @@ function handleSaveSettings() {
   }
   
   emit('update:course', updatedCourse)
-  ElMessage.success('设置保存成功')
+  Message.success('设置保存成功')
 }
 
 // 重置设置
 function handleResetSettings() {
   initSettingsData()
-  ElMessage.success('设置已重置')
+  Message.success('设置已重置')
 }
-
-// 监听课程数据变化
-watch(() => props.course, () => {
-  initSettingsData()
-}, { deep: true, immediate: true })
 </script>
 
 <style scoped lang="scss">
@@ -418,7 +417,7 @@ watch(() => props.course, () => {
   .settings-tabs {
     margin-bottom: 24px;
 
-    .el-tabs__header {
+    .arco-tabs-header {
       margin-bottom: 24px;
     }
   }
@@ -427,7 +426,7 @@ watch(() => props.course, () => {
     max-width: 800px;
     margin-bottom: 32px;
 
-    .el-form-item {
+    .arco-form-item {
       margin-bottom: 20px;
     }
 

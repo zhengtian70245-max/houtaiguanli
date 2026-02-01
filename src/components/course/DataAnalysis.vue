@@ -2,7 +2,7 @@
   <div class="data-analysis">
     <!-- 数据概览 -->
     <div class="data-overview">
-      <el-card shadow="hover" class="overview-card">
+      <a-card class="overview-card">
         <template #header>
           <div class="card-header">
             <span>学习数据</span>
@@ -26,9 +26,9 @@
             <div class="stat-label">转化率</div>
           </div>
         </div>
-      </el-card>
+      </a-card>
 
-      <el-card shadow="hover" class="overview-card">
+      <a-card class="overview-card">
         <template #header>
           <div class="card-header">
             <span>销售数据</span>
@@ -52,86 +52,86 @@
             <div class="stat-label">实际收入</div>
           </div>
         </div>
-      </el-card>
+      </a-card>
     </div>
 
     <!-- 数据选项卡 -->
-    <el-tabs v-model="activeDataTab" class="data-tabs">
-      <el-tab-pane label="学习数据" name="learning">
-        <el-card shadow="hover">
+    <a-tabs v-model:activeKey="activeDataTab" class="data-tabs">
+      <a-tab-pane key="learning" title="学习数据">
+        <a-card>
           <template #header>
             <div class="card-header">
               <span>学习数据趋势</span>
-              <el-select v-model="dateRange" class="date-select">
-                <el-option label="近7天" :value="7" />
-                <el-option label="近30天" :value="30" />
-                <el-option label="近90天" :value="90" />
-                <el-option label="近180天" :value="180" />
-                <el-option label="近365天" :value="365" />
-              </el-select>
+              <a-select v-model="dateRange" class="date-select">
+                <a-option label="近7天" :value="7" />
+                <a-option label="近30天" :value="30" />
+                <a-option label="近90天" :value="90" />
+                <a-option label="近180天" :value="180" />
+                <a-option label="近365天" :value="365" />
+              </a-select>
             </div>
           </template>
           <div class="chart-container">
-            <el-chart :option="learningChartOption" />
+            <div ref="learningChartRef" class="chart"></div>
           </div>
-        </el-card>
-      </el-tab-pane>
+        </a-card>
+      </a-tab-pane>
 
-      <el-tab-pane label="流量数据" name="traffic">
-        <el-card shadow="hover">
+      <a-tab-pane key="traffic" title="流量数据">
+        <a-card>
           <template #header>
             <div class="card-header">
               <span>流量数据趋势</span>
-              <el-select v-model="dateRange" class="date-select">
-                <el-option label="近7天" :value="7" />
-                <el-option label="近30天" :value="30" />
-                <el-option label="近90天" :value="90" />
-                <el-option label="近180天" :value="180" />
-                <el-option label="近365天" :value="365" />
-              </el-select>
+              <a-select v-model="dateRange" class="date-select">
+                <a-option label="近7天" :value="7" />
+                <a-option label="近30天" :value="30" />
+                <a-option label="近90天" :value="90" />
+                <a-option label="近180天" :value="180" />
+                <a-option label="近365天" :value="365" />
+              </a-select>
             </div>
           </template>
           <div class="chart-container">
-            <el-chart :option="trafficChartOption" />
+            <div ref="trafficChartRef" class="chart"></div>
           </div>
-        </el-card>
-      </el-tab-pane>
+        </a-card>
+      </a-tab-pane>
 
-      <el-tab-pane label="分销数据" name="distribution">
-        <el-card shadow="hover">
+      <a-tab-pane key="distribution" title="分销数据">
+        <a-card>
           <template #header>
             <div class="card-header">
               <span>分销数据趋势</span>
-              <el-select v-model="dateRange" class="date-select">
-                <el-option label="近7天" :value="7" />
-                <el-option label="近30天" :value="30" />
-                <el-option label="近90天" :value="90" />
-                <el-option label="近180天" :value="180" />
-                <el-option label="近365天" :value="365" />
-              </el-select>
+              <a-select v-model="dateRange" class="date-select">
+                <a-option label="近7天" :value="7" />
+                <a-option label="近30天" :value="30" />
+                <a-option label="近90天" :value="90" />
+                <a-option label="近180天" :value="180" />
+                <a-option label="近365天" :value="365" />
+              </a-select>
             </div>
           </template>
           <div class="chart-container">
-            <el-chart :option="distributionChartOption" />
+            <div ref="distributionChartRef" class="chart"></div>
           </div>
-        </el-card>
-      </el-tab-pane>
+        </a-card>
+      </a-tab-pane>
 
-      <el-tab-pane label="转化分析" name="conversion">
-        <el-card shadow="hover">
+      <a-tab-pane key="conversion" title="转化分析">
+        <a-card>
           <template #header>
             <div class="card-header">
               <span>转化漏斗</span>
             </div>
           </template>
           <div class="chart-container">
-            <el-chart :option="conversionChartOption" />
+            <div ref="conversionChartRef" class="chart"></div>
           </div>
-        </el-card>
-      </el-tab-pane>
+        </a-card>
+      </a-tab-pane>
 
-      <el-tab-pane label="用户分析" name="user">
-        <el-card shadow="hover">
+      <a-tab-pane key="user" title="用户分析">
+        <a-card>
           <template #header>
             <div class="card-header">
               <span>用户画像</span>
@@ -141,25 +141,25 @@
             <div class="analysis-section">
               <h3>用户类型分布</h3>
               <div class="chart-container small">
-                <el-chart :option="userTypeChartOption" />
+                <div ref="userTypeChartRef" class="chart"></div>
               </div>
             </div>
             <div class="analysis-section">
               <h3>会员等级分布</h3>
               <div class="chart-container small">
-                <el-chart :option="vipLevelChartOption" />
+                <div ref="vipLevelChartRef" class="chart"></div>
               </div>
             </div>
           </div>
-        </el-card>
-      </el-tab-pane>
-    </el-tabs>
+        </a-card>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue'
+import { Message } from '@arco-design/web-vue'
 import * as echarts from 'echarts'
 
 const props = defineProps<{
@@ -169,6 +169,22 @@ const props = defineProps<{
 // 状态管理
 const activeDataTab = ref('learning')
 const dateRange = ref(30)
+
+// 图表引用
+const learningChartRef = ref<HTMLElement | null>(null)
+const trafficChartRef = ref<HTMLElement | null>(null)
+const distributionChartRef = ref<HTMLElement | null>(null)
+const conversionChartRef = ref<HTMLElement | null>(null)
+const userTypeChartRef = ref<HTMLElement | null>(null)
+const vipLevelChartRef = ref<HTMLElement | null>(null)
+
+// 图表实例
+let learningChart: echarts.ECharts | null = null
+let trafficChart: echarts.ECharts | null = null
+let distributionChart: echarts.ECharts | null = null
+let conversionChart: echarts.ECharts | null = null
+let userTypeChart: echarts.ECharts | null = null
+let vipLevelChart: echarts.ECharts | null = null
 
 // 学习数据图表配置
 const learningChartOption = computed(() => {
@@ -456,12 +472,92 @@ const vipLevelChartOption = computed(() => {
   }
 })
 
+// 初始化图表
+function initCharts() {
+  nextTick(() => {
+    // 初始化学习数据图表
+    if (learningChartRef.value) {
+      learningChart = echarts.init(learningChartRef.value)
+      learningChart.setOption(learningChartOption.value)
+    }
+
+    // 初始化流量数据图表
+    if (trafficChartRef.value) {
+      trafficChart = echarts.init(trafficChartRef.value)
+      trafficChart.setOption(trafficChartOption.value)
+    }
+
+    // 初始化分销数据图表
+    if (distributionChartRef.value) {
+      distributionChart = echarts.init(distributionChartRef.value)
+      distributionChart.setOption(distributionChartOption.value)
+    }
+
+    // 初始化转化漏斗图表
+    if (conversionChartRef.value) {
+      conversionChart = echarts.init(conversionChartRef.value)
+      conversionChart.setOption(conversionChartOption.value)
+    }
+
+    // 初始化用户类型分布图表
+    if (userTypeChartRef.value) {
+      userTypeChart = echarts.init(userTypeChartRef.value)
+      userTypeChart.setOption(userTypeChartOption.value)
+    }
+
+    // 初始化会员等级分布图表
+    if (vipLevelChartRef.value) {
+      vipLevelChart = echarts.init(vipLevelChartRef.value)
+      vipLevelChart.setOption(vipLevelChartOption.value)
+    }
+  })
+}
+
+// 更新图表
+function updateCharts() {
+  if (learningChart) {
+    learningChart.setOption(learningChartOption.value)
+  }
+  if (trafficChart) {
+    trafficChart.setOption(trafficChartOption.value)
+  }
+  if (distributionChart) {
+    distributionChart.setOption(distributionChartOption.value)
+  }
+  if (conversionChart) {
+    conversionChart.setOption(conversionChartOption.value)
+  }
+  if (userTypeChart) {
+    userTypeChart.setOption(userTypeChartOption.value)
+  }
+  if (vipLevelChart) {
+    vipLevelChart.setOption(vipLevelChartOption.value)
+  }
+}
+
+// 监听窗口大小变化
+function handleResize() {
+  learningChart?.resize()
+  trafficChart?.resize()
+  distributionChart?.resize()
+  conversionChart?.resize()
+  userTypeChart?.resize()
+  vipLevelChart?.resize()
+}
+
+// 监听数据变化
+watch(() => props.course, () => {
+  updateCharts()
+}, { deep: true })
+
+watch(() => dateRange.value, () => {
+  updateCharts()
+})
+
 // 初始化
 onMounted(() => {
-  // 检查是否有ECharts
-  if (typeof window.echarts === 'undefined') {
-    ElMessage.warning('ECharts 未加载，图表可能无法显示')
-  }
+  initCharts()
+  window.addEventListener('resize', handleResize)
 })
 </script>
 
@@ -508,7 +604,7 @@ onMounted(() => {
   .data-tabs {
     margin-top: 24px;
 
-    .el-tabs__header {
+    .arco-tabs-header {
       margin-bottom: 24px;
     }
 
@@ -529,6 +625,11 @@ onMounted(() => {
 
     &.small {
       height: 300px;
+    }
+
+    .chart {
+      width: 100%;
+      height: 100%;
     }
   }
 

@@ -7,109 +7,111 @@
           <img :src="course.cover" alt="课程封面" />
         </div>
         <div class="course-cover placeholder" v-else>
-          <el-icon><PictureFilled /></el-icon>
+          <IconImage />
           <span>无封面</span>
         </div>
         <div class="course-info">
           <h1 class="course-title">{{ course.title }}</h1>
           <div class="course-meta">
-            <el-tag :type="course.status === 1 ? 'success' : 'danger'">
+            <a-tag :color="course.status === 1 ? 'success' : 'danger'">
               {{ course.status === 1 ? '已发布' : '未发布' }}
-            </el-tag>
-            <el-tag>{{ course.type === 1 ? '视频课程' : '音频课程' }}</el-tag>
-            <el-tag>{{ course.categoryName || '未分类' }}</el-tag>
+            </a-tag>
+            <a-tag>{{ course.type === 1 ? '视频课程' : '音频课程' }}</a-tag>
+            <a-tag>{{ course.categoryName || '未分类' }}</a-tag>
             <span class="course-id">编号：{{ course.id }}</span>
           </div>
           <div class="course-stats">
             <span class="stat-item">
-              <el-icon><View /></el-icon>
+              <IconFile />
               {{ course.stats?.learningData?.viewCount || 0 }} 浏览
             </span>
             <span class="stat-item">
-              <el-icon><ShoppingCart /></el-icon>
+              <IconFile />
               {{ course.stats?.learningData?.payCount || 0 }} 购买
             </span>
             <span class="stat-item">
-              <el-icon><VideoCameraFilled /></el-icon>
+              <IconFile />
               {{ course.totalCoursewares || 0 }} 课件
             </span>
             <span class="stat-item">
-              <el-icon><Document /></el-icon>
+              <IconFile />
               {{ course.totalChapters || 0 }} 章节
             </span>
           </div>
         </div>
       </div>
       <div class="course-actions">
-        <el-button type="primary" @click="handleEditBasicInfo">
-          <el-icon><Edit /></el-icon>
+        <a-button type="primary" @click="handleEditBasicInfo">
+          <template #icon>
+            <IconEdit />
+          </template>
           编辑基本信息
-        </el-button>
-        <el-button :type="course.status === 1 ? 'danger' : 'success'" @click="handleToggleStatus">
-          <el-icon>
-            <Delete v-if="course.status === 1" />
-            <Check v-else />
-          </el-icon>
+        </a-button>
+        <a-button :type="course.status === 1 ? 'danger' : 'success'" @click="handleToggleStatus">
+          <template #icon>
+            <IconStop v-if="course.status === 1" />
+            <IconCheck v-else />
+          </template>
           {{ course.status === 1 ? '下架' : '上架' }}
-        </el-button>
-        <el-button @click="handleBack">
-          <el-icon><ArrowLeft /></el-icon>
+        </a-button>
+        <a-button @click="handleBack">
+          <template #icon>
+            <IconArrowLeft />
+          </template>
           返回列表
-        </el-button>
+        </a-button>
       </div>
     </div>
 
     <!-- 选项卡导航 -->
-    <el-tabs v-model="activeTab" class="course-tabs" @tab-click="handleTabClick">
-      <el-tab-pane label="视频管理" name="videos">
+    <a-tabs v-model="activeTab" class="course-tabs" @change="handleTabClick">
+      <a-tab-pane key="videos" title="视频管理">
         <div class="tab-content">
           <video-manager :course="course" @update:course="updateCourse" />
         </div>
-      </el-tab-pane>
-      <el-tab-pane label="章节管理" name="chapters">
+      </a-tab-pane>
+      <a-tab-pane key="chapters" title="章节管理">
         <div class="tab-content">
           <chapter-manager :course="course" @update:course="updateCourse" />
         </div>
-      </el-tab-pane>
-      <el-tab-pane label="设置管理" name="settings">
+      </a-tab-pane>
+      <a-tab-pane key="settings" title="设置管理">
         <div class="tab-content">
           <course-settings :course="course" @update:course="updateCourse" />
         </div>
-      </el-tab-pane>
-      <el-tab-pane label="评论管理" name="comments">
+      </a-tab-pane>
+      <a-tab-pane key="comments" title="评论管理">
         <div class="tab-content">
           <comment-manager :course="course" />
         </div>
-      </el-tab-pane>
-      <el-tab-pane label="数据分析" name="analytics">
+      </a-tab-pane>
+      <a-tab-pane key="analytics" title="数据分析">
         <div class="tab-content">
           <data-analysis :course="course" />
         </div>
-      </el-tab-pane>
-      <el-tab-pane label="学员管理" name="students">
+      </a-tab-pane>
+      <a-tab-pane key="students" title="学员管理">
         <div class="tab-content">
           <student-manager :course="course" />
         </div>
-      </el-tab-pane>
-    </el-tabs>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { Modal } from '@arco-design/web-vue'
+import message from '@arco-design/web-vue/es/message'
 import {
-  Edit,
-  Delete,
-  Check,
-  ArrowLeft,
-  View,
-  ShoppingCart,
-  VideoCameraFilled,
-  Document,
-  PictureFilled
-} from '@element-plus/icons-vue'
+  IconFile,
+  IconImage,
+  IconEdit,
+  IconStop,
+  IconCheck,
+  IconArrowLeft
+} from '@arco-design/web-vue/es/icon'
 
 // 导入子组件
 import VideoManager from '@/components/course/VideoManager.vue'
@@ -192,9 +194,11 @@ const course = reactive({
 
 // 加载课程数据
 async function loadCourseData() {
+  console.log('loadCourseData 函数被调用')
   const id = route.params.id
-  if (!id) {
-    ElMessage.error('课程ID不存在')
+  console.log('课程ID:', id)
+  if (id === undefined || id === null || id === '') {
+    message.error('课程ID不存在')
     router.push('/course/list')
     return
   }
@@ -204,14 +208,15 @@ async function loadCourseData() {
     await new Promise(resolve => setTimeout(resolve, 800))
     
     // 模拟数据
+    console.log('开始更新课程数据')
     Object.assign(course, {
-      id: Number(id),
+      id: Number(id) || 1,
       title: '高级JavaScript开发实战',
       subtitle: '从入门到精通的全面指南',
       type: 1,
       categoryId: 1,
       categoryName: '前端开发',
-      cover: 'https://via.placeholder.com/150x150',
+      cover: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=JavaScript%20course%20cover%20with%20modern%20design%2C%20programming%20concepts%2C%20blue%20theme&image_size=square',
       intro: '本课程将带你深入了解JavaScript的高级特性和最佳实践',
       detail: '详细介绍JavaScript的各种高级概念和应用场景',
       price: 299,
@@ -335,14 +340,14 @@ async function loadCourseData() {
       publishTime: '2026-01-10 00:00:00'
     })
   } catch (error) {
-    ElMessage.error('加载课程数据失败')
+    message.error('加载课程数据失败')
   }
 }
 
 // 更新课程数据
 function updateCourse(newCourseData: any) {
+  // 直接更新课程数据，不使用 nextTick，避免在组件销毁后仍然执行代码
   Object.assign(course, newCourseData)
-  ElMessage.success('课程数据已更新')
 }
 
 // 编辑基本信息
@@ -352,18 +357,16 @@ function handleEditBasicInfo() {
 
 // 切换课程状态
 function handleToggleStatus() {
-  ElMessage.confirm(
-    course.status === 1 ? '确定要下架该课程吗？' : '确定要发布该课程吗？',
-    '操作确认',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: course.status === 1 ? 'warning' : 'success'
+  Modal.confirm({
+    title: '操作确认',
+    content: course.status === 1 ? '确定要下架该课程吗？' : '确定要发布该课程吗？',
+    okText: '确定',
+    cancelText: '取消',
+    onOk() {
+      course.status = course.status === 1 ? 0 : 1
+      message.success(course.status === 1 ? '课程已发布' : '课程已下架')
     }
-  ).then(() => {
-    course.status = course.status === 1 ? 0 : 1
-    ElMessage.success(course.status === 1 ? '课程已发布' : '课程已下架')
-  }).catch(() => {})
+  })
 }
 
 // 返回列表
@@ -372,8 +375,8 @@ function handleBack() {
 }
 
 // 选项卡切换
-function handleTabClick(tab: any) {
-  console.log('切换到选项卡：', tab.paneName)
+function handleTabClick(activeKey: string) {
+  console.log('切换到选项卡：', activeKey)
   // 可以在这里添加选项卡切换时的逻辑
 }
 
@@ -384,151 +387,417 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+// 全局样式变量
+$primary-color: #1890ff;
+$success-color: #52c41a;
+$warning-color: #faad14;
+$error-color: #f5222d;
+$text-color-primary: #303133;
+$text-color-secondary: #606266;
+$text-color-tertiary: #909399;
+$border-color: #e4e7ed;
+$background-color: #f5f7fa;
+$card-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+$transition: all 0.3s ease;
+
+// 页面容器
+.page-container {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  padding: 20px;
+}
+
+// 课程头部信息区域
 .course-header {
-  background: #f5f7fa;
-  border-radius: 8px;
-  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
   margin-bottom: 24px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 24px;
+  gap: 32px;
+  box-shadow: $card-shadow;
+  transition: $transition;
 
+  &:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  // 课程基本信息
   .course-basic-info {
     flex: 1;
     display: flex;
-    gap: 24px;
+    gap: 32px;
+    align-items: flex-start;
 
+    // 课程封面
     .course-cover {
-      width: 120px;
-      height: 120px;
-      border-radius: 8px;
+      width: 160px;
+      height: 160px;
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: $transition;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      }
 
       img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        transition: $transition;
+
+        &:hover {
+          transform: scale(1.05);
+        }
       }
     }
 
+    // 无封面占位
     .course-cover.placeholder {
-      background: #e4e7ed;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ed 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      color: #909399;
+      color: $text-color-tertiary;
+      border: 2px dashed $border-color;
+      transition: $transition;
 
-      .el-icon {
-        font-size: 32px;
-        margin-bottom: 8px;
+      &:hover {
+        border-color: $primary-color;
+        color: $primary-color;
+      }
+
+      :deep(.arco-icon) {
+        font-size: 48px;
+        margin-bottom: 12px;
+        transition: $transition;
+      }
+
+      span {
+        font-size: 14px;
+        font-weight: 500;
       }
     }
 
+    // 课程信息
     .course-info {
       flex: 1;
+      min-width: 0;
 
+      // 课程标题
       .course-title {
-        font-size: 24px;
-        font-weight: 600;
-        margin: 0 0 16px 0;
-        color: #303133;
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0 0 20px 0;
+        color: $text-color-primary;
+        line-height: 1.3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
       }
 
+      // 课程元信息
       .course-meta {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
+        gap: 16px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
 
+        // 标签样式
+        :deep(.arco-tag) {
+          font-size: 13px;
+          padding: 4px 12px;
+          border-radius: 16px;
+          font-weight: 500;
+          transition: $transition;
+
+          &:hover {
+            transform: translateY(-1px);
+          }
+        }
+
+        // 课程编号
         .course-id {
           font-size: 14px;
-          color: #909399;
+          color: $text-color-tertiary;
+          background-color: $background-color;
+          padding: 4px 12px;
+          border-radius: 16px;
         }
       }
 
+      // 课程统计信息
       .course-stats {
         display: flex;
         align-items: center;
-        gap: 24px;
+        gap: 32px;
+        flex-wrap: wrap;
 
+        // 统计项
         .stat-item {
           display: flex;
           align-items: center;
-          gap: 6px;
-          font-size: 14px;
-          color: #606266;
+          gap: 8px;
+          font-size: 15px;
+          color: $text-color-secondary;
+          background-color: $background-color;
+          padding: 8px 16px;
+          border-radius: 20px;
+          transition: $transition;
 
-          .el-icon {
-            font-size: 16px;
+          &:hover {
+            background-color: #e6f7ff;
+            color: $primary-color;
+            transform: translateY(-1px);
+          }
+
+          :deep(.arco-icon) {
+            font-size: 18px;
+            color: $primary-color;
+          }
+
+          // 数字部分
+          span {
+            font-weight: 600;
+            margin-left: 4px;
           }
         }
       }
     }
   }
 
+  // 操作按钮组
   .course-actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+    min-width: 180px;
+
+    // 按钮样式统一
+    :deep(.arco-button) {
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 24px;
+      border-radius: 8px;
+      transition: $transition;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+      }
+
+      // 主要按钮
+      &.arco-button-primary {
+        background-color: $primary-color;
+        border-color: $primary-color;
+
+        &:hover {
+          background-color: #40a9ff;
+          border-color: #40a9ff;
+        }
+      }
+
+      // 危险按钮
+      &.arco-button-danger {
+        background-color: $error-color;
+        border-color: $error-color;
+
+        &:hover {
+          background-color: #ff4d4f;
+          border-color: #ff4d4f;
+        }
+      }
+
+      // 次要按钮
+      &.arco-button-default {
+        background-color: #fff;
+        border-color: $border-color;
+
+        &:hover {
+          border-color: $primary-color;
+          color: $primary-color;
+        }
+      }
+    }
   }
 }
 
+// 选项卡导航区域
 .course-tabs {
-  margin-top: 24px;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-  padding-left: 24px;
-  .el-tabs__header {
+  border-radius: 12px;
+  box-shadow: $card-shadow;
+  overflow: hidden;
+  transition: $transition;
+
+  &:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  // 选项卡头部
+  :deep(.arco-tabs-header) {
     margin: 0;
-    border-bottom: 1px solid #e4e7ed;
+    border-bottom: 1px solid $border-color;
+    background-color: #fafafa;
 
-    .el-tabs__nav {
-      padding: 0 24px;
+    // 选项卡导航
+    .arco-tabs-nav {
+      padding: 0 32px;
+      height: 64px;
+      align-items: center;
     }
 
-    .el-tabs__item {
+    // 选项卡项
+    .arco-tabs-tab {
       font-size: 16px;
-      padding: 0 20px;
-      height: 56px;
-      line-height: 56px;
+      font-weight: 500;
+      padding: 0 24px;
+      height: 64px;
+      line-height: 64px;
+      color: $text-color-secondary;
+      transition: $transition;
+
+      &:hover {
+        color: $primary-color;
+      }
+
+      &.arco-tabs-tab-active {
+        color: $primary-color;
+        font-weight: 600;
+      }
     }
 
-    .el-tabs__active-bar {
+    // 激活条
+    .arco-tabs-active-bar {
       height: 3px;
-      background: #1890ff;
+      background: $primary-color;
+      border-radius: 3px;
     }
   }
 
-  .el-tabs__content {
-    padding: 24px;
+  // 选项卡内容
+  :deep(.arco-tabs-content) {
+    padding: 32px;
   }
 }
 
+// 标签内容区域
 .tab-content {
   min-height: 600px;
+  background-color: #fff;
 }
 
-@media (max-width: 768px) {
+// 响应式设计
+@media (max-width: 1200px) {
   .course-header {
     flex-direction: column;
     align-items: stretch;
 
     .course-basic-info {
       flex-direction: column;
+      align-items: center;
+      text-align: center;
 
       .course-cover,
       .course-cover.placeholder {
-        width: 100%;
+        width: 200px;
         height: 200px;
+      }
+
+      .course-info {
+        .course-stats {
+          justify-content: center;
+        }
       }
     }
 
     .course-actions {
       flex-direction: row;
-      justify-content: flex-end;
+      justify-content: center;
+      margin-top: 16px;
+
+      :deep(.arco-button) {
+        flex: 1;
+        max-width: 200px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 12px;
+  }
+
+  .course-header {
+    padding: 20px;
+    gap: 20px;
+
+    .course-basic-info {
+      gap: 20px;
+
+      .course-cover,
+      .course-cover.placeholder {
+        width: 150px;
+        height: 150px;
+      }
+
+      .course-info {
+        .course-title {
+          font-size: 24px;
+        }
+
+        .course-meta {
+          gap: 12px;
+        }
+
+        .course-stats {
+          gap: 16px;
+
+          .stat-item {
+            font-size: 13px;
+            padding: 6px 12px;
+          }
+        }
+      }
+    }
+
+    .course-actions {
+      flex-direction: column;
+      align-items: stretch;
+
+      :deep(.arco-button) {
+        max-width: none;
+      }
+    }
+  }
+
+  .course-tabs {
+    :deep(.arco-tabs-header) {
+      .arco-tabs-nav {
+        padding: 0 16px;
+        height: 56px;
+      }
+
+      .arco-tabs-tab {
+        font-size: 14px;
+        padding: 0 16px;
+        height: 56px;
+        line-height: 56px;
+      }
+    }
+
+    :deep(.arco-tabs-content) {
+      padding: 20px;
     }
   }
 }
