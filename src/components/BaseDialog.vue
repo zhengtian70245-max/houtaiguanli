@@ -1,21 +1,16 @@
 <template>
-  <el-dialog
-    v-model="dialogVisible"
+  <a-modal
+    v-model:visible="dialogVisible"
     :title="title"
     :width="width"
     :top="top"
-    :modal="modal"
-    :append-to-body="appendToBody"
-    :destroy-on-close="destroyOnClose"
-    @close="handleClose"
-    @open="handleOpen"
+    :mask="modal"
+    :mask-closable="false"
+    @cancel="handleCancel"
+    @ok="handleConfirm"
   >
     <slot />
-    <template v-if="showButtons" #footer>
-      <el-button @click="handleCancel">取消</el-button>
-      <el-button type="primary" :loading="confirmLoading" @click="handleConfirm">确定</el-button>
-    </template>
-  </el-dialog>
+  </a-modal>
 </template>
 
 <script setup lang="ts">
@@ -42,14 +37,6 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
-  appendToBody: {
-    type: Boolean,
-    default: false
-  },
-  destroyOnClose: {
-    type: Boolean,
-    default: false
-  },
   showButtons: {
     type: Boolean,
     default: true
@@ -74,36 +61,28 @@ function handleConfirm() {
 function handleCancel() {
   emit('cancel')
 }
-
-function handleClose() {
-  emit('close')
-}
-
-function handleOpen() {
-  emit('open')
-}
 </script>
 
 <style scoped lang="scss">
 .base-dialog {
-  :deep(.el-dialog) {
+  :deep(.arco-modal) {
     border-radius: 8px;
 
-    .el-dialog__header {
+    .arco-modal-header {
       padding: 18px 20px;
       border-bottom: 1px solid #e8e8e8;
 
-      .el-dialog__title {
+      .arco-modal-title {
         font-size: 16px;
         font-weight: 600;
       }
     }
 
-    .el-dialog__body {
+    .arco-modal-body {
       padding: 20px;
     }
 
-    .el-dialog__footer {
+    .arco-modal-footer {
       padding: 12px 20px 20px;
       border-top: 1px solid #e8e8e8;
       text-align: right;

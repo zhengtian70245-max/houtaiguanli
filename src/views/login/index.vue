@@ -5,29 +5,28 @@
         <h2>zhengtian 管理后台</h2>
         <p>欢迎登录，管理您的教育平台</p>
       </div>
-      <el-form :model="loginForm" :rules="rules" ref="loginFormRef" class="login-form">
-        <el-form-item prop="username">
-          <el-input
+      <a-form :model="loginForm" :rules="rules" ref="loginFormRef" class="login-form">
+        <a-form-item prop="username">
+          <a-input
             v-model="loginForm.username"
             placeholder="请输入用户名"
             size="large"
-            prefix-icon="User"
+            :prefix-icon="iconUser"
             @keyup.enter="handleLogin"
           />
-        </el-form-item>
-        <el-form-item prop="password">
-          <el-input
+        </a-form-item>
+        <a-form-item prop="password">
+          <a-input
             v-model="loginForm.password"
             type="password"
             placeholder="请输入密码"
             size="large"
-            prefix-icon="Lock"
-            show-password
+            :prefix-icon="iconLock"
             @keyup.enter="handleLogin"
           />
-        </el-form-item>
-        <el-form-item>
-          <el-button
+        </a-form-item>
+        <a-form-item>
+          <a-button
             type="primary"
             size="large"
             :loading="loading"
@@ -35,9 +34,9 @@
             @click="handleLogin"
           >
             登录
-          </el-button>
-        </el-form-item>
-      </el-form>
+          </a-button>
+        </a-form-item>
+      </a-form>
       <div class="login-footer">
         <p>测试账号：admin / 123456</p>
       </div>
@@ -49,7 +48,8 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { Message, type FormInstance } from '@arco-design/web-vue'
+import { IconUser, IconLock } from '@arco-design/web-vue/es/icon'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -62,7 +62,7 @@ const loginForm = reactive({
   password: ''
 })
 
-const rules: FormRules = {
+const rules = {
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
@@ -99,19 +99,17 @@ async function login() {
         permissions: ['*:*:*']
       }
 
-      const token = 'mock-token-' + Date.now()
+      userStore.setUser(userInfo)
+      userStore.setToken('mock-token-' + Date.now())
 
-      userStore.setUserInfo(userInfo)
-      userStore.setToken(token)
-
-      ElMessage.success('登录成功')
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      Message.success('登录成功')
       router.push('/dashboard')
     } else {
-      ElMessage.error('用户名或密码错误')
+      Message.error('用户名或密码错误')
     }
   } catch (error) {
-    console.error(error)
-    ElMessage.error('登录失败，请重试')
+    Message.error('登录失败，请稍后重试')
   } finally {
     loading.value = false
   }
@@ -120,17 +118,16 @@ async function login() {
 
 <style scoped lang="scss">
 .login-container {
-  width: 100%;
-  height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 
   .login-box {
     width: 400px;
-    padding: 40px 32px;
-    background: #fff;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
@@ -140,33 +137,38 @@ async function login() {
 
       h2 {
         font-size: 24px;
-        font-weight: bold;
+        font-weight: 600;
         color: #333;
-        margin-bottom: 8px;
+        margin: 0 0 8px 0;
       }
 
       p {
-        font-size: 14px;
-        color: #999;
+        color: #666;
+        margin: 0;
       }
     }
 
     .login-form {
+      :deep(.arco-form-item) {
+        margin-bottom: 24px;
+      }
+
       .login-btn {
         width: 100%;
-        height: 48px;
-        font-size: 16px;
-        font-weight: 500;
+        margin-top: 8px;
       }
     }
 
     .login-footer {
       text-align: center;
       margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #eee;
 
       p {
-        font-size: 12px;
         color: #999;
+        margin: 0;
+        font-size: 14px;
       }
     }
   }

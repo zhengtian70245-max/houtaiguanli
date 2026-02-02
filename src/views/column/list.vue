@@ -91,67 +91,67 @@
         </a-space>
       </template>
 
-      <a-table
-        :data="columnsData"
-        :loading="loading"
-        :pagination="false"
-        :row-selection="{
-          type: 'checkbox',
-          showCheckedAll: true
-        }"
-        @selection-change="handleSelectionChange"
-        row-key="id"
-      >
-        <template #columns>
-          <a-table-column title="专栏封面" :width="100" align="center">
-            <template #cell="{ record }">
+      <!-- 手动渲染的完整表格 -->
+      <table class="manual-table">
+        <thead>
+          <tr>
+            <th style="width: 55px;"><input type="checkbox" /></th>
+            <th style="width: 100px; text-align: center;">专栏封面</th>
+            <th style="width: 200px;">专栏名称</th>
+            <th style="width: 120px; text-align: center;">分组</th>
+            <th style="width: 100px; text-align: center;">状态</th>
+            <th style="width: 80px; text-align: center;">课程数</th>
+            <th style="width: 180px; text-align: center;">创建时间</th>
+            <th style="width: 80px; text-align: center;">序号</th>
+            <th style="width: 150px; text-align: center;">创建账号</th>
+            <th style="width: 200px; text-align: center;">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in columnsData" :key="item.id">
+            <td><input type="checkbox" /></td>
+            <td style="text-align: center;">
               <div class="column-cover">
-                <img :src="record.cover" alt="专栏封面" v-if="record.cover" />
+                <img :src="item.cover" alt="专栏封面" v-if="item.cover" />
                 <div class="cover-placeholder" v-else>
                   <icon-image />
                 </div>
               </div>
-            </template>
-          </a-table-column>
-          <a-table-column title="专栏名称" :width="200">
-            <template #cell="{ record }">
+            </td>
+            <td>
               <div class="column-info">
-                <div class="column-name">{{ record.name }}</div>
+                <div class="column-name">{{ item.name }}</div>
                 <div class="column-price">
-                  <span class="price current">{{ record.price }}</span>
-                  <span class="price original" v-if="record.originalPrice">{{ record.originalPrice }}</span>
+                  <span class="price current">{{ item.price }}</span>
+                  <span class="price original" v-if="item.originalPrice">{{ item.originalPrice }}</span>
                 </div>
               </div>
-            </template>
-          </a-table-column>
-          <a-table-column title="分组" data-index="categoryName" :width="120" align="center" />
-          <a-table-column title="状态" data-index="status" :width="100" align="center">
-            <template #cell="{ record }">
-              <a-tag :color="record.status === 1 ? 'green' : record.status === 2 ? 'red' : 'orange'">
-                {{ record.status === 1 ? '已上架' : record.status === 2 ? '已下架' : '草稿' }}
+            </td>
+            <td style="text-align: center;">{{ item.categoryName }}</td>
+            <td style="text-align: center;">
+              <a-tag :color="item.status === 1 ? 'green' : item.status === 2 ? 'red' : 'orange'">
+                {{ item.status === 1 ? '已上架' : item.status === 2 ? '已下架' : '草稿' }}
               </a-tag>
-            </template>
-          </a-table-column>
-          <a-table-column title="课程数" data-index="courseCount" :width="80" align="center" />
-          <a-table-column title="创建时间" data-index="createTime" :width="180" align="center" />
-          <a-table-column title="序号" data-index="order" :width="80" align="center" />
-          <a-table-column title="创建账号" data-index="createAccount" :width="150" align="center" />
-          <a-table-column title="操作" :width="200" align="center" fixed="right">
-            <template #cell="{ record }">
+            </td>
+            <td style="text-align: center;">{{ item.courseCount }}</td>
+            <td style="text-align: center;">{{ item.createTime }}</td>
+            <td style="text-align: center;">{{ item.order }}</td>
+            <td style="text-align: center;">{{ item.createAccount }}</td>
+            <td style="text-align: center;">
               <a-space :size="4">
-                <a-button type="text" size="small" @click="handleViewDetail(record)">
+                <a-button type="text" size="small" @click="handleViewDetail(item)">
                   <template #icon>
                     <icon-eye />
                   </template>
                   详情
                 </a-button>
-                <a-button type="text" size="small" @click="handleEdit(record)">
+                <a-button type="text" size="small" @click="handleEdit(item)">
                   <template #icon>
                     <icon-edit />
                   </template>
                   编辑
                 </a-button>
-                <a-button type="text" size="small" @click="handleShare(record)">
+                <a-button type="text" size="small" @click="handleShare(item)">
                   <template #icon>
                     <icon-share-alt />
                   </template>
@@ -165,16 +165,16 @@
                     </template>
                   </a-button>
                   <template #content>
-                    <a-doption v-if="record.status !== 1" @click="handlePublish(record)">上架</a-doption>
-                    <a-doption v-if="record.status === 1" @click="handleUnpublish(record)">下架</a-doption>
-                    <a-doption @click="handleDelete(record)">删除</a-doption>
+                    <a-doption v-if="item.status !== 1" @click="handlePublish(item)">上架</a-doption>
+                    <a-doption v-if="item.status === 1" @click="handleUnpublish(item)">下架</a-doption>
+                    <a-doption @click="handleDelete(item)">删除</a-doption>
                   </template>
                 </a-dropdown>
               </a-space>
-            </template>
-          </a-table-column>
-        </template>
-      </a-table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <div class="pagination-wrapper">
         <a-pagination
@@ -453,6 +453,51 @@ function handleSizeChange(size: number) {
             text-decoration: line-through;
           }
         }
+      }
+    }
+
+    .manual-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+      background-color: #fff;
+
+      th {
+        background-color: #fafbfc;
+        color: #333;
+        font-weight: 500;
+        text-align: left;
+        padding: 12px 16px;
+        border-bottom: 1px solid #eaeef2;
+        font-size: 14px;
+      }
+
+      th:first-child,
+      td:first-child {
+        padding-left: 20px;
+      }
+
+      th:last-child,
+      td:last-child {
+        padding-right: 20px;
+      }
+
+      td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f0f2f5;
+        font-size: 14px;
+        color: #333;
+      }
+
+      tr:hover {
+        background-color: #f7f9fc;
+      }
+
+      tr:last-child td {
+        border-bottom: none;
       }
     }
   }

@@ -1,0 +1,1489 @@
+快速上手
+跟随以下的步骤，快速上手组件库的使用。
+Vue 版本
+vue >= 3.2.0
+
+注意：由于 Vue3 不再支持 IE 浏览器环境，ArcoVue 也不再支持 IE 浏览器环境。
+
+安装
+# npm
+npm install --save-dev @arco-design/web-vue
+# yarn
+yarn add --dev @arco-design/web-vue
+完整引入
+import { createApp } from 'vue'
+import ArcoVue from '@arco-design/web-vue';
+import App from './App.vue';
+import '@arco-design/web-vue/dist/arco.css';
+
+const app = createApp(App);
+app.use(ArcoVue);
+app.mount('#app');
+按需加载（模板）
+如果使用模板方式进行开发，可以使用 unplugin-vue-components 和 unplugin-auto-import 这两款插件来开启按需加载及自动导入的支持。
+插件会自动解析模板中的使用到的组件，并导入组件和对应的样式文件。
+需要组件库 version >= 2.11.0。
+
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite';
+import { ArcoResolver } from 'unplugin-vue-components/resolvers';
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    vue(),
+    AutoImport({
+      resolvers: [ArcoResolver()],
+    }),
+    Components({
+      resolvers: [
+        ArcoResolver({
+          sideEffect: true
+        })
+      ]
+    })
+  ]
+});
+注意：这种方法并不会处理用户在 script 中手动导入的组件，比如 Message 组件，用户仍需要手动导入组件对应的样式文件，例如 @arco-design/web-vue/es/message/style/css.js。
+
+按需加载与组件库主题（Arco 插件）
+另外也可以使用 Arco 提供的 Vite 插件进行按需加载和组件库样式配置，@arco-plugins/vite-vue 插件会自动加载组件样式。
+
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { vitePluginForArco } from '@arco-plugins/vite-vue'
+
+export default defineConfig({
+  plugins: [
+    vue(),
+    vitePluginForArco({
+      style: 'css'
+    })
+  ]
+})
+全局配置
+在引入 ArcoVue 时，可以传入一个全局配置对象。
+
+import { createApp } from 'vue'
+import ArcoVue from '@arco-design/web-vue';
+import App from './App.vue';
+import '@arco-design/web-vue/dist/arco.css';
+
+const app = createApp(App);
+app.use(ArcoVue, {
+  // 用于改变使用组件时的前缀名称
+  componentPrefix: 'arco'
+});
+app.mount('#app');
+导入组件
+组件库在 2.44.3 版本为了兼容 nuxt3 环境，增加 exports 配置。这个配置会对组件库的导入产生一定影响，使用中建议从 @arco-design/web-vue 和 @arco-design/web-vue/es/icon 导入组件库和图标。
+
+浏览器兼容性
+Edge
+Edge
+Firefox
+Firefox
+Chrome
+Chrome
+Safari
+Safari
+Opera
+Opera
+≥ 79
+≥ 78
+≥ 64
+≥ 12
+≥ 53
+暗黑模式
+组件库内置暗色的主题，你可以轻易的切换到暗色。
+切换到暗黑模式
+组件库通过 body 标签上的 arco-theme 属性来标明当前的主题，所以你只要修改这个属性，即可完成主题的切换。
+
+// 设置为暗黑主题
+document.body.setAttribute('arco-theme', 'dark')
+
+// 恢复亮色主题
+document.body.removeAttribute('arco-theme');
+原理和内置颜色
+定制主题
+ArcoVue提供了一套蓝色主题（ArcoBlue），用户可以根据自己的需求定制新主题，以满足业务和品牌上的多样化需求。
+ArcoDesign定义了一套默认粒子变量，可以通过对粒子变量的修改覆盖来定制主题。
+
+Less 变量替换
+ArcoDesign 使用了 Less 作为预编译语言，通过 Less 的 modifyVars 功能，可以很方便的对样式粒子变量进行定制。
+
+全局变量可在 global.less (@arco-design/web-vue/es/style/theme/global.less) 中可以找到。
+
+在组件库内部我们对组件样式变量做了非常细致的抽离提取，可以满足对组件细粒度的定制。例如 Button 组件对应的样式变量 token.less (@arco-design/web-vue/es/button/style/token.less) 列表。
+
+引入组件库样式文件
+如果想要进行主题定制，需要引入 less 样式文件。组件库 less 样式文件可以在 @arco-design/web-vue/dist/arco.less 或者 @arco-design/web-vue/es/index.less 中找到。
+如果使用了按需加载的方式引入组件，请确保在按需加载插件中开启了 less 样式文件的导入。
+
+Vite配置
+Vite 本身支持 Less语法 ，用户只需在配置文件中传入Less的配置即可：
+
+// vite.config.js
+export default {
+  css: {
++   preprocessorOptions: {
++     less: {
++       modifyVars: {
++         'arcoblue-6': '#f85959',
++       },
++       javascriptEnabled: true,
++     }
++   }
+  },
+  ...
+}
+Webpack配置
+在 Webpack 打包的时候，通过 less-loader 的 modifyVars，可以对所有的变量进行替换：
+
+// webpack.config.js
+module.exports = {
+  rules: [{
+    test: /\.less$/,
+    use: [{
+      loader: 'style-loader',
+    }, {
+      loader: 'css-loader',
+    }, {
+      loader: 'less-loader',
++     options: {
++       lessOptions: {
++         modifyVars: {
++           'arcoblue-6': '#f85959',
++         },
++         javascriptEnabled: true,
++       },
++     },
+    }],
+    ...
+  }],
+  ...
+}
+风格配置平台主题包使用
+风格配置平台 Vue 的主题包已经可以使用。
+设计变量
+组件库的全局 Token，可以在此查看组件库内置的设计变量以及默认值
+
+ Light
+
+ Dark
+主色
+变量名
+变量值
+CSS变量
+描述
+primary-6
+rgb(var(--arcoblue-6))
+--primary-6
+常规
+primary-5
+rgb(var(--arcoblue-5))
+--primary-5
+悬浮（hover）
+primary-7
+rgb(var(--arcoblue-7))
+--primary-7
+点击（click）
+primary-4
+rgb(var(--arcoblue-4))
+--primary-4
+特殊场景
+primary-3
+rgb(var(--arcoblue-3))
+--primary-3
+一般禁用
+primary-2
+rgb(var(--arcoblue-2))
+--primary-2
+文字禁用
+primary-1
+rgb(var(--arcoblue-1))
+--primary-1
+浅色/白底悬浮
+成功色
+变量名
+变量值
+CSS变量
+描述
+success-6
+rgb(var(--green-6))
+--success-6
+常规
+success-5
+rgb(var(--green-5))
+--success-5
+悬浮（hover）
+success-7
+rgb(var(--green-7))
+--success-7
+点击（click）
+success-4
+rgb(var(--green-4))
+--success-4
+特殊场景
+success-3
+rgb(var(--green-3))
+--success-3
+一般禁用
+success-2
+rgb(var(--green-2))
+--success-2
+文字禁用
+success-1
+rgb(var(--green-1))
+--success-1
+浅色/白底悬浮
+警示色
+变量名
+变量值
+CSS变量
+描述
+warning-6
+rgb(var(--orange-6))
+--warning-6
+常规
+warning-5
+rgb(var(--orange-5))
+--warning-5
+悬浮（hover）
+warning-7
+rgb(var(--orange-7))
+--warning-7
+点击（click）
+warning-4
+rgb(var(--orange-4))
+--warning-4
+特殊场景
+warning-3
+rgb(var(--orange-3))
+--warning-3
+一般禁用
+warning-2
+rgb(var(--orange-2))
+--warning-2
+文字禁用
+warning-1
+rgb(var(--orange-1))
+--warning-1
+浅色/白底悬浮
+错误色
+变量名
+变量值
+CSS变量
+描述
+danger-6
+rgb(var(--red-6))
+--danger-6
+常规
+danger-5
+rgb(var(--red-5))
+--danger-5
+悬浮（hover）
+danger-7
+rgb(var(--red-7))
+--danger-7
+点击（click）
+danger-4
+rgb(var(--red-4))
+--danger-4
+特殊场景
+danger-3
+rgb(var(--red-3))
+--danger-3
+一般禁用
+danger-2
+rgb(var(--red-2))
+--danger-2
+文字禁用
+danger-1
+rgb(var(--red-1))
+--danger-1
+浅色/白底悬浮
+链接色
+变量名
+变量值
+CSS变量
+描述
+link-6
+rgb(var(--arcoblue-6))
+--link-6
+常规
+link-5
+rgb(var(--arcoblue-5))
+--link-5
+悬浮（hover）
+link-7
+rgb(var(--arcoblue-7))
+--link-7
+点击（click）
+link-4
+rgb(var(--arcoblue-4))
+--link-4
+特殊场景
+link-3
+rgb(var(--arcoblue-3))
+--link-3
+一般禁用
+link-2
+rgb(var(--arcoblue-2))
+--link-2
+文字禁用
+link-1
+rgb(var(--arcoblue-1))
+--link-1
+浅色/白底悬浮
+边框颜色
+变量名
+变量值
+CSS变量
+描述
+color-border-1
+var(--color-neutral-2)
+--color-border-1
+浅色
+color-border-2
+var(--color-neutral-3)
+--color-border-2
+一般
+color-border-3
+var(--color-neutral-4)
+--color-border-3
+深/悬浮
+color-border-4
+var(--color-neutral-6)
+--color-border-4
+重/按钮描边
+填充颜色
+变量名
+变量值
+CSS变量
+描述
+color-fill-1
+var(--color-neutral-1)
+--color-fill-1
+浅/禁用
+color-fill-2
+var(--color-neutral-2)
+--color-fill-2
+常规/白底悬浮
+color-fill-3
+var(--color-neutral-3)
+--color-fill-3
+深/灰底悬浮
+color-fill-4
+var(--color-neutral-4)
+--color-fill-4
+重/特殊场景
+文字颜色
+变量名
+变量值
+CSS变量
+描述
+color-text-1
+var(--color-neutral-10)
+--color-text-1
+强调/正文标题
+color-text-2
+var(--color-neutral-8)
+--color-text-2
+次强调/正文标题
+color-text-3
+var(--color-neutral-6)
+--color-text-3
+次要信息
+color-text-4
+var(--color-neutral-4)
+--color-text-4
+置灰信息
+背景颜色
+变量名
+变量值
+CSS变量
+描述
+color-bg-1
+#FFF
+--color-bg-1
+整体背景色
+color-bg-2
+#FFF
+--color-bg-2
+一级容器背景
+color-bg-3
+#FFF
+--color-bg-3
+二级容器背景
+color-bg-4
+#FFF
+--color-bg-4
+三级容器背景
+color-bg-5
+#FFF
+--color-bg-5
+下拉弹出框、Tooltip 背景颜色
+color-bg-white
+#FFF
+--color-bg-white
+白色背景
+字体大小
+变量名
+变量值
+CSS变量
+描述
+font-size-body-3
+14px
+-
+正文-常规
+font-size-body-2
+13px
+-
+正文-常规-小
+font-size-body-1
+12px
+-
+辅助文案/次要文案
+font-size-caption
+12px
+-
+水印文本
+font-size-title-1
+16px
+-
+标题-小
+font-size-title-2
+20px
+-
+标题-中
+font-size-title-3
+24px
+-
+标题-大
+font-size-display-1
+36px
+-
+运营标题-小
+font-size-display-2
+48px
+-
+运营标题-中
+font-size-display-3
+56px
+-
+运营标题-大
+字重
+变量名
+变量值
+CSS变量
+描述
+font-weight-400
+400
+-
+常规
+font-weight-500
+500
+-
+中等（加粗）
+font-weight-600
+600
+-
+半粗
+font-weight-700
+700
+-
+粗体
+font-weight-800
+800
+-
+中黑
+font-weight-900
+900
+-
+黑体
+font-weight-300
+300
+-
+细体
+font-weight-200
+200
+-
+纤细
+font-weight-100
+100
+-
+极细
+尺寸
+变量名
+变量值
+CSS变量
+描述
+size-none
+0
+-
+0
+size-1
+4px
+-
+4px
+size-2
+8px
+-
+8px
+size-3
+12px
+-
+12px
+size-4
+16px
+-
+迷你（24px）
+size-5
+20px
+-
+20px
+size-N
+(4 * N)px
+-
+变量对应的值为 (4 * N)px 大小
+size-50
+200px
+-
+200px
+组件尺寸
+变量名
+变量值
+CSS变量
+描述
+size-mini
+@size-6
+-
+迷你（24px）
+size-small
+@size-7
+-
+较小（28px）
+size-default
+@size-8
+-
+中等（32px）
+size-large
+@size-9
+-
+较大（36px）
+边框宽度
+变量名
+变量值
+CSS变量
+描述
+border-none
+0
+-
+无边框
+border-1
+1px
+-
+常规
+border-2
+2px
+-
+较粗
+border-3
+3px
+-
+粗
+边框圆角
+变量名
+变量值
+CSS变量
+描述
+border-radius-none
+0
+--border-radius-none
+直角
+border-radius-small
+2px
+--border-radius-small
+圆角-常规
+border-radius-medium
+4px
+--border-radius-medium
+圆角-中等
+border-radius-large
+8px
+--border-radius-large
+圆角-较大
+border-radius-circle
+50%
+--border-radius-circle
+圆角-全圆角
+阴影
+变量名
+变量值
+CSS变量
+描述
+shadow-special
+0 0 1px rgba(0, 0, 0, 0.3)
+-
+特殊阴影
+shadow1-center
+0 -2px 5px rgba(0, 0, 0, 0.1)
+-
+阴影样式1
+shadow2-center
+0 0 10px rgba(0, 0, 0, 0.1)
+-
+阴影样式2
+shadow3-center
+0 0 20px rgba(0, 0, 0, 0.1)
+-
+阴影样式3
+国际化
+所有组件文案默认使用的是中文，通过设置可以使用其它语言。
+通过 ConfigProvider 组件实现国际化。
+
+基本用法
+<template>
+  <a-config-provider :locale="enUS">
+    <a-pagination :total="50" show-total show-jumper show-page-size />
+  </a-config-provider>
+</template>
+
+<script>
+import enUS from '@arco-design/web-vue/es/locale/lang/en-us';
+
+export default {
+  data() {
+    return {
+      enUS,
+    };
+  },
+};
+</script>
+支持的地区语言
+语言
+地区编码
+简体中文
+zh-CN
+英文
+en-US
+日文
+ja-JP
+繁体中文（中国台湾）
+zh-TW
+葡萄牙语
+pt-PT
+西班牙语
+es-ES
+印度尼西亚语
+id-ID
+法语（法国）
+fr-FR
+德语（德国）
+de-DE
+韩语
+ko-KR
+意大利语(意大利)
+it-IT
+马来语(马来西亚)
+ms-MY
+泰语
+th-TH
+越南语
+vi-VN
+高棉语（柬埔寨）
+km-KH
+阿拉伯语（埃及）
+ar-EG
+俄语（俄罗斯）
+ru-RU
+常见问题
+组件库使用中的常见问题解答
+受控与非受控
+Arco Design Vue 组件库中使用了 受控 的概念，正如其名，组件的显示状态将始终与传入值相同。我们推荐通过受控模式来使用输入组件。
+
+这时可以通过 双向绑定（v-model） 或者 change 事件来修改 model-value 的值，来保证组件内部与外部的值相同。
+
+在受控模式中，如果希望控制显示的值，可以使用 change 事件进行处理。
+
+如果我们不希望控制组件的值，可以使用非受控模式，此时组件的值将维护在组件内部，可以通过 default-value 来设置初始值。非受控模式下可以通过 change 事件来获取组件的值。
+
+特别注意：
+default-* 类属性用来设置非受控模式下的初始值，不会影响后续的状态。此值与受控值同时使用时，受控值优先生效。
+
+下拉菜单的滚动跟随
+下拉菜单默认会跟随 window 滚动条的变化更新位置，如果将包含下拉菜单的组件放置在一个可滚动的容器中，会出现容器滚动时下拉菜单没有更新位置的问题，此时可以通过组件内部的 trigger 配置，将 updateAtScroll
+设置为 true 开启滚动更新的支持。
+
+如果项目内此场景较多，可以通过 ConfigProvider 组件全局开启此属性。
+
+虚拟列表的使用
+支持设置虚拟列表的组件 List 、Select、Table、Tree 设置 virtual-list-props 开启虚拟列表功能。
+
+虚拟列表元素的渲染分为 元素高度固定，元素高度动态 两种情况。
+
+参数名
+描述
+类型
+默认值
+版本
+height
+可视区域高度
+number | string
+-
+fixedSize
+列表内元素是否为固定大小（高度）
+boolean
+false
+2.34.1
+estimatedSize
+预估大小（高度）[当 fixedSize 为 true 时，此值无效]，如果它更接近平均大小，则滚动条长度看起来将更准确。建议分配自己计算的平均值。默认动态高度将使用首个 Section 的平均值
+number
+-
+2.34.1
+buffer
+视口边界外提前挂载的元素数量。（Section = buffer * 3）默认值为 10（也就是 Section 默认为 30）, 建议根据列表视口的高度做调整，此值太大会影响性能。
+number
+10
+2.34.1
+快速开始
+请跟随以下步骤创建 Arco Design Pro
+环境
+开始开发之前，请确认本地环境中安装好了 node， git 和 arco cli。
+
+其中 arco cli 是安装项目模版的工具，请运行以下命令安装：
+
+npm i -g arco-cli
+技术栈
+本项目的技术栈为 vue + ES2015+ + TypeScript + Arco Design 和 echarts等，提前学习和了解这些知识将帮助你更好地上手我们的项目。
+
+安装
+这一步是以 Arco Design Pro 为模版创建一个新的项目，请按照以下步骤进行：
+
+进入到一个文件夹，新建项目
+cd someDir
+arco init hello-arco-pro
+选择 技术栈
+ ? 请选择你希望使用的技术栈
+   React
+ ❯ Vue
+选择 arco-design-pro 分类
+ ? 请选择一个分类
+   业务组件
+   组件库
+   Lerna Menorepo 项目
+ ❯ Arco Pro 项目
+等待安装依赖。。。
+
+看到以下输出就是创建成功了
+
+
+
+开发
+进入到项目中，运行代码
+
+cd hello-arco-pro
+
+npm run dev
+打开 localhost:3000 就能看到如下页面
+
+
+
+npm 命令
+package.json script 预置方便实用的命令
+配置文件
+├── README.md
+├── config
+│   ├── plugin  # vite插件
+│   ├── vite.config.base.ts  # 基础环境配置
+│   ├── vite.config.dev.ts  # 开发环境配置
+│   ├── vite.config.prod.ts  # 生产环境配置
+└── package.json
+本地开发
+npm run dev
+调用的命令如下
+
+{
+  "scripts": {
+    "dev": "vite --config ./config/vite.config.dev.ts",
+  }
+}
+构建生产
+npm run build
+调用的命令如下，可以根据实际需要，查阅vite官网，进行输出配置。
+
+{
+  "scripts": {
+    "build": "vue-tsc --noEmit && vite build --config ./config/vite.config.prod.ts",
+  }
+}
+目录结构
+项目文件的组织结构
+目录
+├── README.md
+├── package.json
+├── index.html
+├── src
+│   ├── api  # 请求接口
+│   ├── assets  # 静态资源
+│          └── style 全局样式
+│   ├── components  # 通用业务组件
+│   ├── config  # 全局配置(包含echarts主题)
+│          └── settings.json  # 配置文件
+│   ├── directives # 指令集（如需，可自行补充）
+│   ├── filters # 过滤器（如需，可自行补充）
+│   ├── hooks # 全局hooks
+│   ├── layout  # 布局
+│   ├── locale  # 国际化语言包
+│   ├── mock  # 模拟数据
+│   ├── views  # 页面模板
+│   ├── router # 路由配置
+│   ├── store  # 状态管理中心
+│   ├── types  # Typescript 类型
+│   └── utils  # 工具库
+│   └── App.vue  # 视图入口
+│   └── main.ts  # 入口文件
+└── tsconfig.json
+
+布局
+目前提供的布局只有一套，应用到了所有路由页面上，包含侧边菜单栏，顶部通知栏，页脚和内容区域，其中侧边栏和顶部通知栏都是 fixed 的，方便用户在滚动的过程中关注到其他视图。
+
+
+
+此外，响应式的侧边栏会在窗口宽度小于 1200px 的时候，自动收缩如下：
+
+路由与菜单
+路由和菜单的生成
+路由通常都和菜单绑定在一起，为了减少维护的量，我们直接通过路由表生成了菜单。
+
+路由
+首先，需要先了解一下路由表的配置。基本的路由配置请参阅 Vue-Router 官方文档
+
+// 在本例子中，页面最终路径为 /dashboard/workplace
+export default {
+ path: 'dashboard',
+ name: 'dashboard', // 路由名称
+ component: () => import('@/views/dashboard/index.vue'),
+ meta: {
+   locale: 'menu.dashboard',
+   requiresAuth: true,
+   icon: 'icon-dashboard',
+ },
+ children: [
+   {
+     path: 'workplace',
+     name: 'workplace',
+     component: () => import('@/views/dashboard/workplace/index.vue'),
+     meta: {
+       locale: 'menu.dashboard.workplace',
+       requiresAuth: true,
+       roles: ['admin'],
+       hideInMenu: false,
+     },
+   },
+ ],
+};
+路由 Meta 元信息
+
+参数名
+说明
+类型
+默认值
+roles
+配置能访问该页面的角色，如果不匹配，则会被禁止访问该路由页面
+string[]
+-
+requiresAuth
+是否需要登录鉴权
+boolean
+false
+icon
+菜单配置icon
+string
+-
+locale
+一级菜单名（语言包键名）
+string
+-
+hideInMenu
+是否在左侧菜单中隐藏该项
+boolean
+-
+hideChildrenInMenu
+强制在左侧菜单中显示单项
+boolean
+-
+activeMenu
+高亮设置的菜单项
+string
+-
+order
+排序路由菜单项。如果设置该值，值越高，越靠前
+number
+-
+noAffix
+如果设置为true，标签将不会添加到tab-bar中
+boolean
+-
+ignoreCache
+如果设置为true页面将不会被缓存
+boolean
+-
+菜单
+前端菜单生成过程：
+
+通过 appRoute 计算属性，得到带有路由信息的路由树。
+
+使用上一步获取的路由信息进行权限过滤，生成用于渲染的 菜单树。
+
+通过 渲染 菜单树，递归生成菜单。
+
+服务端菜单生成过程：
+
+在Store中增加api请求的 action，用于获取服务端的路由配置。
+
+发起请求，将服务端的路由配置结果存储在Store中。
+
+通过 appRoute 计算属性，得到带有路由信息的路由树。
+
+使用上一步获取的路由信息进行权限过滤，生成用于渲染的 菜单树。
+
+通过 渲染 菜单树，递归生成菜单。
+
+说明：服务端菜单相对于本地菜单生成过程，仅仅是多了接口请求以及服务端路由配置信息存储的步骤。
+个别公司可能会有相应的权限管理系统，以生成相应的服务端路由配置信息，并进行储存，以供前端进行接口调取。但总体大同小异，只要后端接口返回的路由配置信息，符合上述路由配置规范，并能被前端正确解析即可
+
+新增一个菜单项的步骤
+了解完路由和菜单的生成，就可以上手配置一个新的菜单项了，以新增一个监控页面为例。
+
+在 views/dashboard 中新增一个 monitor 文件夹，并在其中新增 index.vue
+<script lang="ts" setup><script>
+在路由表中新增监控页的路由配置
+export default {
+  path: 'dashboard',
+  name: 'dashboard',
+  component: () => import('@/views/dashboard/index.vue'),
+  meta: {
+    locale: 'menu.dashboard',
+    requiresAuth: true,
+    icon: 'icon-dashboard',
+  },
+  children: [
+    {
+      path: 'workplace',
+      name: 'workplace',
+      component: () => import('@/views/dashboard/workplace/index.vue'),
+      meta: {
+        locale: 'menu.dashboard.workplace',
+        requiresAuth: true,
+      },
+    },
++   {
++     path: 'monitor',
++     name: 'monitor',
++     component: () => import('@/views/dashboard/monitor/index.vue'),
++     meta: {
++       locale: 'menu.dashboard.monitor',
++       requiresAuth: true,
++       roles: ['admin'],
++     },
++   },
+  ],
+};
+在语言包中新增菜单名
+以下是中文语言包，其他语言包不赘述。
+
+// src/locale/zh-CN.ts
+export default {
+  'menu.dashboard': '仪表盘',
+  'menu.dashboard.workplace': '工作台',
++ 'menu.dashboard.monitor': '实时监控',
+}
+以上，就完成了一个菜单项的配置。现在刷新一下页面，就能看到新的菜单项。
+权限控制
+权限控制是中后台场景非常常见的基础功能，在 v2.2.0 将权限控制功能集成至 Arco Design Pro
+适用场景
+中后台常见的前端权限控制大概可概括为以下场景：
+
+菜单权限控制，针对某个菜单/页面进行权限管理，有则能看到此页面，否则将展示无权限。
+针对某页面中的某触发器进行权限管理，例如对列表页的某一条数据进行删除操作。有权限情况下则展示删除按钮。
+使用
+菜单权限管理
+针对菜单及路由权限控制，可以在 路由配置项 中，对某项增加 roles 参数即可。（如果不加，默认为拥有权限）
+
+roles 可以根据自己的业务进行定义。
+
+export default {
+  path: 'dashboard',
+  name: 'dashboard',
+  component: () => import('@/views/dashboard/index.vue'),
+  meta: {
+    locale: 'menu.dashboard',
+    requiresAuth: true,
+    icon: 'icon-dashboard',
+  },
+  children: [
+    {
+      path: 'workplace',
+      name: 'workplace',
+      component: () => import('@/views/dashboard/workplace/index.vue'),
+      meta: {
+        locale: 'menu.dashboard.workplace',
+        requiresAuth: true,
+        roles: ['*'], // * 表示通配权限。提示：为了少写点代码，也可以不定义这个字段。
+      },
+    },
+    {
+      path: 'monitor',
+      name: 'monitor',
+      component: () => import('@/views/dashboard/monitor/index.vue'),
+      meta: {
+        locale: 'menu.dashboard.monitor',
+        requiresAuth: true,
+        roles: ['admin'],
+      },
+    },
+  ],
+};
+某按钮权限管理
+Arco Design Pro 封装了 v-permission 指令。可在组件或者原生元素上使用。
+如下，将有权限的角色类型放置在数组中即可。
+
+<button v-permission="['admin']">删除</button>
+
+<a-button v-permission="['user']">删除</a-button>
+以上是前端页面进行权限控制的具体使用方法，但是需要结合后端接口将用户所拥有的具体权限返回至前端。
+
+同时，在中后台系统中，仅仅有简单的前端权限控制是远远不够的，还需要后端进行接口权限控制。特别是涉及到写操作的一些接口，需要严格把控权限。
+
+实现
+路由权限管理
+Pro提供对应的权限管理钩子。可以自定义业务的权限需求。
+
+#src/hooks/permission.ts
+
+import { RouteLocationNormalized, RouteRecordRaw } from 'vue-router';
+import { useUserStore } from '@/store';
+
+export default function usePermission() {
+  const userStore = useUserStore();
+  return {
+    accessRouter(route: RouteLocationNormalized | RouteRecordRaw) { // 判断当前用户是否有该路由的权限
+      return (
+        !route.meta?.requiresAuth ||
+        !route.meta?.roles ||
+        route.meta?.roles?.includes('*') ||
+        route.meta?.roles?.includes(userStore.role)
+      );
+    },
+    // You can add any rules you want
+  };
+}
+设置路由守卫，在路由守卫中对用户的页面进出进行管理。例如 当前用户是否已经登录、当前用户是否有页面权限。
+
+router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore();
+  async function crossroads() {
+    const Permission = usePermission();
+    if (Permission.accessRouter(to)) await next();
+    else {
+      const destination = Permission.findFirstPermissionRoute(
+        appRoutes,
+        userStore.role
+      ) || {
+        name: 'notFound',
+      }; // 前往首个有权限的页面或者404。
+      await next(destination);
+    }
+  }
+  if (isLogin()) { // 判读用户是否登录
+    if (userStore.role) { // 有角色信息表示当前用户已经登录且获取过用户信息
+      crossroads();
+    } else {
+      try {
+        await userStore.info(); // 获取用户角色信息后再进行后续跳转处理
+        crossroads();
+      } catch (error) {
+        next({
+          name: 'login',
+          query: {
+            redirect: to.name,
+            ...to.query,
+          } as LocationQueryRaw,
+        });
+      }
+    }
+  } else {
+    // 如果未登录则重定向到登录页面
+    if (to.name === 'login') {
+      next();
+      return;
+    }
+    next({
+      name: 'login',
+      query: {
+        redirect: to.name,
+        ...to.query,
+      } as LocationQueryRaw,
+    });
+  }
+});
+自定义权限指令
+
+import { DirectiveBinding } from 'vue';
+import { useUserStore } from '@/store';
+
+function checkPermission(el: HTMLElement, binding: DirectiveBinding) {
+  const { value } = binding;
+  const userStore = useUserStore();
+  const { role } = userStore;
+
+  if (Array.isArray(value)) {
+    if (value.length > 0) {
+      const permissionValues = value;
+      // 对当前用户的角色权限和传入指令的权限类型进行比对。如果当前用户无权限则会执行节点删除操作。
+      const hasPermission = permissionValues.includes(role);
+      if (!hasPermission && el.parentNode) {
+        el.parentNode.removeChild(el);
+      }
+    }
+  } else {
+    throw new Error(`need roles! Like v-permission="['admin','user']"`);
+  }
+}
+
+export default {
+  mounted(el: HTMLElement, binding: DirectiveBinding) {
+    checkPermission(el, binding);
+  },
+  updated(el: HTMLElement, binding: DirectiveBinding) {
+    checkPermission(el, binding);
+  },
+};
+状态管理 - Pinia
+全站状态管理
+Arco Pro Version
+Arco Pro >= 2.1.0
+
+注意： Arco Pro 2.1.0 版本已经将状态管理库替换为 Pinia。
+
+Pinia 说明
+使用Pinia替换Vuex，有基于技术前瞻性的考虑。
+
+同时 Evan You 已经于 2021年11月24日 在推特宣布 Pinia 正式成为 vuejs 官方的状态库，意味着 Pinia 就是 Vuex 5 。
+
+关于 Pinia 带来的众多新特性及用法，大家可以在 Pinia 官网进行学习了解。本文不做过多赘述。
+
+前言
+全局状态管理是一个大型系统不可避免的存在，因为经常有一些需要全局共享的信息需要存储，比如用户信息，所以 PRO 中内置了 Pinia 用于信息共享。
+
+使用 Pinia ，目录更加简洁明了。 同时对Typescript的支持更加友好，具有无可比拟的优越性。
+
+├── modulers
+│ ├── user (具体模块，以实际项目为准)
+│ │ └── index.ts (store定义)
+│ │ └── types.ts (store类型)
+├── index.ts （用于导出store）
+添加新模块
+添加 state 类型声明
+// store/modulers/user/types.ts
+export interface UserState {
+  name: string;
+  avatar: string;
+}
+定义store，就像定义一个组件一样简单
+// store/modulers/user/index.ts
+import { defineStore } from 'pinia';
+import {
+  login as userLogin,
+  getUserInfo,
+  LoginData,
+} from '@/api/user';
+import { setToken } from '@/utils/auth';
+import { UserState } from './types';
+
+export const useUserStore = defineStore('user', {
+  state: (): UserState => ({
+    name: '',
+    avatar: '',
+  }),
+
+  getters: {
+    userInfo(state: UserState): UserState {
+      return { ...state };
+    },
+  },
+
+  actions: {
+
+    // Get user's information
+    async info() {
+      const res = await getUserInfo();
+
+      this.setInfo(res.data);
+    },
+
+    // Login
+    async login(loginForm: LoginData) {
+      const res = await userLogin(loginForm);
+      setToken(res.data.token);
+    },
+  },
+});
+具体使用
+import { defineComponent } from 'vue';
+import { useUserStore } from '@/store';
+
+export default defineComponent({
+  setup() {
+    const userStore = useUserStore();
+    const login = () => {
+      const userInfo ={
+        username: 'admin',
+        password: 'admin',
+      };
+      await userStore.login(userInfo);
+    }
+    return {
+      login,
+    }
+  }
+})
+接口和数据模拟
+网络请求、拦截器及模拟数据
+网络请求
+使用axios进行远程接口请求。
+
+建议完善返回及请求数据的类型定义。
+
+import axios from 'axios';
+
+export interface UserToken {
+ token: string;
+}
+
+export interface UserStateTypes {
+ name: string;
+ location: string;
+}
+export function getUserInfo(data: UserToken) {
+ // 通过传递泛型，以获得完整的类型提示。
+ return axios.post<UserStateTypes>('/api/user/info', data);
+}
+拦截器
+可以根据自身系统需要增加多层拦截器。
+
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+// 用户可以根据自身后台系统进行修改
+export interface HttpResponse<T = unknown> {
+ status: number;
+ msg: string;
+ code: number;
+ data: T;
+}
+
+axios.interceptors.request.use(
+ (config: AxiosRequestConfig) => {
+   // 此处对请求进行配置
+   return config;
+ },
+ (error) => {
+   // 对请求错误做些什么
+   return Promise.reject(error);
+ }
+);
+// 添加响应拦截器
+axios.interceptors.response.use(
+ (response: AxiosResponse<HttpResponse>) => {
+   const res = response.data;
+   // if the custom code is not 20000, it is judged as an error.
+   if (res.code !== 20000) {
+     // remind users
+
+     // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
+     if (
+       [50008, 50012, 50014].includes(res.code)
+     ) {
+       // do something
+     }
+     return Promise.reject(new Error(res.msg || 'Error'));
+   }
+   return res;
+ },
+ (error) => {
+   return Promise.reject(error);
+ }
+);
+拦截 ajax 并返回模拟的数据
+
+mock解决方案
+前后端并行开发意味着前端需要在没有接口数据的情况下进行开发，在这种情况下如果能提供模拟数据请求的功能，我们的数据请求代码就能正常书写，Pro 采用了 Mock.js 来实现这个功能。
+
+Mock.js 会拦截 ajax 请求，如果有匹配的 mock 规则，就不会将 ajax 发出去，而是返回 mock 的数据。Mock.js 有着丰富的模拟数据生成方法，建议先读一下文档，文档写的很清晰易懂 MockJs 文档
+
+import Mock from 'mockjs';
+import {
+ successResponseWrap,
+} from '@/utils/setup-mock';
+
+Mock.mock(new RegExp('/api/chatList'), () => {
+   const data = Mock.mock(successResponseWrap({
+       'data|4-6': [
+           {
+               'id|+1': 1,
+               username: '用户7352772',
+               content: '马上就开始了，好激动！',
+               time: '13:09:12',
+               'isCollect|2': true,
+           },
+       ],
+   }));
+
+   return data.data;
+});
+当客户端发送请求的 url 被 new RegExp('/api/chatList') 匹配到，Mock.js 就会拦截这条请求，并执行对应的回调函数，返回回调函数中 return 的数据。
+
+注意：被 Mock.js 匹配并拦截的请求，不会出现在开发者工具的 network 面板中。
+
+关闭 Mock
+为了方便开启和关闭数据模拟功能，每个 Mock 都会被 setupMock.setup 包裹，setupMock 如下：
+
+import { debug } from './env';
+export default ({ mock, setup }: { mock?: boolean; setup: () => void; }) => {
+  if (mock !== false && debug) setup();
+};
+非生产环境下默认启动数据模拟，当我们需要调试接口的时候只需要将 setupMock 的 mock 参数置为 false 即可，如下：
+
+import Mock from 'mockjs';
+import setupMock from '../utils/setupMock';
+
+setupMock({
+ mock: false
+ setup() {
+ // 用户信息
+   Mock.mock(new RegExp('/api/userInfo'), () => {
+       return {
+         name: 'name',
+       };
+   });
+ },
+});
+打包构建
+打包代码
+打包构建
+当代码书写完成后，执行以下命令即可打包代码
+
+npm run build
+该命令调用的是 vite 提供的打包命令，打包完成后，会在根目录生成 dist 文件夹，这里面就是可以用于部署的代码。
+
+PS: 打包体积缩减提示！！！
+
+因为在Pro项目中，展示的table组件需要 vue compile 功能，所以引入了带有编译器的版本。
+
+如果不需要vue 模板编译功能，删除对应的业务代码后，配置指定的vue版本，构建打包以缩小打包体积。
+
+如果需要 vue 模板编译 能力，可在 vite.config.prod.ts 文件 中进行配置（如下）。
+
+// config/vite.config.build.ts
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+ mode: 'production',
+ ...
+ resolve: {
+   alias: [
+     {
+       find: 'vue',
+       replacement: 'vue/dist/vue.esm-bundler.js', // 需要编译tmp
+     },
+   ],
+ },
+});
+更多具体配置详见vite官网。
+初始化
+一、arco-cli初始化失败
+
+
+依赖安装失败的问题，进入到初始化项目的目录，重新执行执行npm install 或 yarn install安装操作即可。
+
+开发相关
+一、菜单项如何设置高亮？
+详见 路由和菜单
+
+二、菜单隐藏子项
+详见 路由和菜单
+
+三、配置一级菜单项
+因为架构缘故，配置单独的一级菜单项，需要多个菜单配置项进行配合。详见 #85
+
+四、Vue3 中使用 jsx 写法
+详见 babel-plugin-jsx
+
+五、跨域代理
+详见 vite配置
+
+六、代码无法提交
+因为使用了 husky 的缘故，钩子对上传的commit信息进行规范化校验。
+
+请按照文档进行git commit信息规范化。
+
+如果不需要该功能，可以删除掉husky相关文件和对应脚本。（不推荐）
+
+构建相关
+一. Rollup failed to resolve import "XXXXXX/node_modules/@arco-design/web-vue/es/xxx-xxx/style/css.js”
+报错源于按需加载构建插件(config/plugin/styleImport.ts)，该问题产生分别有以下几个原因
+
+新版组件库新增了组件。
+
+组件本身遗漏未进行添加。
+
+unplugin-vue-components 依赖库版本过低。
+
+解决方法请 移步。
+
+二、执行构建TS类型报错
+
+
+报错原因：
+
+写法本身存在问题。
+
+新版组件库对类型声明进行了变更修改。
+
+解决方法：
+
+按照类型提示进行修改。
+
+关闭vue-tsc检查。(不推荐)
+
+// package.json
+
+  "build": "vue-tsc --noEmit && vite build --config ./config/vite.config.prod.ts"  // 修改前
+
+  "build": "vite build --config ./config/vite.config.prod.ts" // 修改后
+三、vue-tsc构建缓慢
+重新安装vue-tsc至最新版本。
+# npm
+npm install vue-tsc@latest
+# yarn
+yarn add vue-tsc@latest
+关闭vue-tsc检查。(不推荐)
+四、预览打包项目
+# npm
+npm run preview
+# yarn
+yarn preview
+PS: 该预览命令在Pro中会先执行build操作。
+
+部署相关
+一、页面部署成功后刷新出现404页面
+移步 Vue Router
+
+其它
+一、已经开发的项目是否能够升级到最新版？
+Arco Pro作为一个项目模板，不具备平滑升级过渡到最新版本的能力。
+
+如需新版本能力，可以初始化一个项目后将自己的业务代码拷贝进去，在进行相应的更改即可。

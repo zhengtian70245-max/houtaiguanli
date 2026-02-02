@@ -1,64 +1,113 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import type { Ref } from 'vue'
+import { generateMenuFromRoutes, MenuItem } from './menu'
+import usePermission from '@/hooks/permission'
+import { RouteRecordRaw } from 'vue-router'
 
-export interface UserInfo {
+export interface UserState {
   id: number
   username: string
   name: string
-  avatar?: string
+  avatar: string
   role: string
   permissions: string[]
+  token: string
+  isLogin: boolean
 }
 
-export const useUserStore = defineStore(
-  'user',
-  () => {
-    const userInfo: Ref<UserInfo | null> = ref(null)
-    const token: Ref<string> = ref('')
+export const useUserStore = defineStore('user', {
+  state: (): UserState => ({
+    id: 0,
+    username: '',
+    name: '',
+    avatar: '',
+    role: '',
+    permissions: [],
+    token: '',
+    isLogin: false
+  }),
 
-    function setUserInfo(info: UserInfo) {
-      userInfo.value = info
-    }
+  getters: {
+    userInfo(state: UserState): UserState {
+      return { ...state }
+    },
 
-    function setToken(tokenStr: string) {
-      token.value = tokenStr
-      localStorage.setItem('token', tokenStr)
-    }
+    isSuperAdmin(state: UserState): boolean {
+      return state.role === 'super'
+    },
 
-    function getToken() {
-      return token.value || localStorage.getItem('token') || ''
-    }
-
-    function logout() {
-      userInfo.value = null
-      token.value = ''
-      localStorage.removeItem('token')
-      localStorage.removeItem('userInfo')
-    }
-
-    function initUserInfo() {
-      const userInfoStr = localStorage.getItem('userInfo')
-      const tokenStr = localStorage.getItem('token')
-      if (userInfoStr) {
-        userInfo.value = JSON.parse(userInfoStr)
-      }
-      if (tokenStr) {
-        token.value = tokenStr
-      }
-    }
-
-    return {
-      userInfo,
-      token,
-      setUserInfo,
-      setToken,
-      getToken,
-      logout,
-      initUserInfo
+    hasPermission(state: UserState, permission: string): boolean {
+      return state.permissions.includes('*:*:*') || state.permissions.includes(permission)
     }
   },
-  {
-    persist: true
+
+  actions: {
+    setToken(token: string) {
+      this.token = token
+      this.isLogin = true
+      localStorage.setItem('token', token)
+    },
+
+    setUserInfo(userInfo: Partial<UserState>) {
+      Object.assign(this, userInfo)
+      this.isLogin = true
+    },
+
+    async login(username: string, password: string) {
+      try {
+        const response = await fetch('/api/user/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        })
+
+        const result = await response.json()
+
+        if (result.code === 200 && result.data) {
+          this.setToken(result.data.token)
+          this.setUserInfo(result.data.userInfo)
+          return result.data
+        } else {
+          throw new Error(result.msg || '登录失败')
+        }
+      } catch (error) {
+        throw error
+      }
+    },
+
+    async getInfo() {
+      try {
+        const response = await fetch('/api/user/info', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${this.token}`
+          }
+        })
+
+        const result = await response.json()
+
+        if (result.code === 200 && result.data) {
+          this.setUserInfo(result.data)
+          return result.data
+        } else {
+          throw new Error(result.msg || '获取用户信息失败')
+        }
+      } catch (error) {
+        throw error
+      }
+    },
+
+    logout() {
+      this.id = 0
+      this.username = ''
+      this.name = ''
+      this.avatar = ''
+      this.role = ''
+      this.permissions = []
+      this.token = ''
+      this.isLogin = false
+      localStorage.removeItem('token')
+    }
   }
-)
+})

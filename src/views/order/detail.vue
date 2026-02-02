@@ -3,18 +3,18 @@
     <div class="page-header">
       <h2>订单详情</h2>
       <div class="page-actions">
-        <el-button @click="$router.go(-1)">返回</el-button>
+        <a-button @click="$router.go(-1)">返回</a-button>
       </div>
     </div>
     <div class="page-content">
-      <el-card class="order-card" body-style="padding: 20px">
+      <a-card class="order-card" :body-style="{ padding: '20px' }">
         <div class="order-header">
           <div class="order-info">
             <div class="order-id">订单号：{{ orderInfo.id }}</div>
             <div class="order-status" :class="orderInfo.status === 1 ? 'success' : 'danger'">
-              <el-tag :type="orderInfo.status === 1 ? 'success' : 'danger'">
+              <a-tag :color="orderInfo.status === 1 ? 'green' : 'red'">
                 {{ orderInfo.status === 1 ? '已支付' : '未支付' }}
-              </el-tag>
+              </a-tag>
             </div>
           </div>
           <div class="order-price">
@@ -55,40 +55,44 @@
 
           <div class="order-section">
             <div class="section-title">订单商品</div>
-            <el-table style="width: 100%" :data="orderInfo.items" border stripe>
-              <el-table-column prop="name" label="商品名称" min-width="200" />
-              <el-table-column prop="price" label="单价" width="100" align="right">
-                <template #default="{ row }">
-                  ¥{{ row.price.toFixed(2) }}
-                </template>
-              </el-table-column>
-              <el-table-column prop="quantity" label="数量" width="80" align="center" />
-              <el-table-column prop="subtotal" label="小计" width="100" align="right">
-                <template #default="{ row }">
-                  ¥{{ row.subtotal.toFixed(2) }}
-                </template>
-              </el-table-column>
-            </el-table>
+            <a-table :data="orderInfo.items" :bordered="true" :stripe="true">
+              <template #columns>
+                <a-table-column title="商品名称" data-index="name" :min-width="200" />
+                <a-table-column title="单价" :width="100" align="right">
+                  <template #cell="{ record }">
+                    ¥{{ record.price.toFixed(2) }}
+                  </template>
+                </a-table-column>
+                <a-table-column title="数量" :width="80" align="center" data-index="quantity" />
+                <a-table-column title="小计" :width="100" align="right">
+                  <template #cell="{ record }">
+                    ¥{{ record.subtotal.toFixed(2) }}
+                  </template>
+                </a-table-column>
+              </template>
+            </a-table>
           </div>
 
           <div class="order-section">
             <div class="section-title">分销信息</div>
             <div class="distributor-info">
-              <el-table :data="orderInfo.distributor" border stripe>
-                <el-table-column prop="level" label="分销层级" width="100" align="center" />
-                <el-table-column prop="nickname" label="分销用户" width="120" align="center" />
-                <el-table-column prop="phone" label="手机号" width="130" align="center" />
-                <el-table-column prop="commission" label="佣金" width="120" align="right">
-                  <template #default="{ row }">
-                    ¥{{ row.commission.toFixed(2) }}
-                  </template>
-                </el-table-column>
-                <el-table-column prop="rate" label="佣金比例" width="120" align="center">
-                  <template #default="{ row }">
-                    {{ row.rate }}%
-                  </template>
-                </el-table-column>
-              </el-table>
+              <a-table :data="orderInfo.distributor" :bordered="true" :stripe="true">
+                <template #columns>
+                  <a-table-column title="分销层级" :width="100" align="center" data-index="level" />
+                  <a-table-column title="分销用户" :width="120" align="center" data-index="nickname" />
+                  <a-table-column title="手机号" :width="130" align="center" data-index="phone" />
+                  <a-table-column title="佣金" :width="120" align="right">
+                    <template #cell="{ record }">
+                      ¥{{ record.commission.toFixed(2) }}
+                    </template>
+                  </a-table-column>
+                  <a-table-column title="佣金比例" :width="120" align="center">
+                    <template #cell="{ record }">
+                      {{ record.rate }}%
+                    </template>
+                  </a-table-column>
+                </template>
+              </a-table>
             </div>
           </div>
 
@@ -103,15 +107,17 @@
             </div>
           </div>
         </div>
-      </el-card>
+      </a-card>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { ElMessage } from 'element-plus'
+import { reactive, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { Message } from '@arco-design/web-vue'
 
+const route = useRoute()
 const orderInfo = reactive({
   id: '20240101123456',
   price: 198,
@@ -157,7 +163,7 @@ const orderInfo = reactive({
 })
 
 onMounted(() => {
-  const orderId = $route.params.id
+  const orderId = route.params.id
   if (orderId) {
     orderInfo.id = `20240101${orderId}`
   }

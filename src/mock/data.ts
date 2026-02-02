@@ -1,24 +1,22 @@
+import Mock from 'mockjs'
 import type { UserInfo } from '@/stores/user'
 
-export interface MockDataService {
-  login(username: string, password: string): Promise<{ token: string; userInfo: UserInfo }>
-  getUsers(params: any): Promise<{ list: any[]; total: number }>
-  getCourses(params: any): Promise<{ list: any[]; total: number }>
-  getActivities(params: any): Promise<{ list: any[]; total: number }>
-  getOrders(params: any): Promise<{ list: any[]; total: number }>
-  getVips(params: any): Promise<{ list: any[]; total: number }>
-  getDistributors(params: any): Promise<{ list: any[]; total: number }>
-  getStatistics(): Promise<any>
-  getCourseCategories(params: any): Promise<{ list: any[]; total: number }>
-  saveSystemConfig(config: any): Promise<boolean>
-  saveVipConfig(config: any): Promise<boolean>
-  saveDistributorConfig(config: any): Promise<boolean>
-  saveSmsConfig(config: any): Promise<boolean>
-  savePaymentConfig(config: any): Promise<boolean>
+interface SuccessResponse<T = any> {
+  code: number
+  msg: string
+  data: T
 }
 
-export const mockDataService: MockDataService = {
-  async login(username: string, password: string): Promise<{ token: string; userInfo: UserInfo }> {
+function successResponseWrap<T>(data: T, msg = '操作成功'): SuccessResponse<T> {
+  return {
+    code: 200,
+    msg,
+    data
+  }
+}
+
+export const mockData = {
+  login(username: string, password: string): Promise<{ token: string; userInfo: UserInfo }> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         if (username === 'admin' && password === '123456') {
@@ -39,7 +37,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async getUsers(params: any): Promise<{ list: any[]; total: number }> {
+  getUsers(params: any): Promise<{ list: any[]; total: number }> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const list = Array.from({ length: 10 }).map((_, index) => {
@@ -64,7 +62,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async getCourses(params: any): Promise<{ list: any[]; total: number }> {
+  getCourses(params: any): Promise<{ list: any[]; total: number }> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const list = Array.from({ length: 10 }).map((_, index) => {
@@ -86,7 +84,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async getActivities(params: any): Promise<{ list: any[]; total: number }> {
+  getActivities(params: any): Promise<{ list: any[]; total: number }> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const list = Array.from({ length: 10 }).map((_, index) => {
@@ -109,7 +107,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async getOrders(params: any): Promise<{ list: any[]; total: number }> {
+  getOrders(params: any): Promise<{ list: any[]; total: number }> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const list = Array.from({ length: 10 }).map((_, index) => {
@@ -131,7 +129,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async getVips(params: any): Promise<{ list: any[]; total: number }> {
+  getVips(params: any): Promise<{ list: any[]; total: number }> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const list = Array.from({ length: 10 }).map((_, index) => {
@@ -153,7 +151,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async getDistributors(params: any): Promise<{ list: any[]; total: number }> {
+  getDistributors(params: any): Promise<{ list: any[]; total: number }> {
     return new Promise((resolve) => {
       setTimeout(() => {
         const list = Array.from({ length: 10 }).map((_, index) => {
@@ -176,27 +174,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async getCourseCategories(params: any): Promise<{ list: any[]; total: number }> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const list = Array.from({ length: 5 }).map((_, index) => {
-          const id = index + 1
-          return {
-            id,
-            name: ['专业课', '家长必修', '精品专题', 'VIP专区', '其他'][index],
-            description: ['专业课程分类', '家长必修课程分类', '精品专题课程分类', 'VIP专区课程分类', '其他课程分类'][index],
-            sortOrder: index + 1,
-            status: true,
-            createTime: '2023-01-01',
-            updateTime: '2023-01-01'
-          }
-        })
-        resolve({ list, total: 5 })
-      }, 500)
-    })
-  },
-
-  async getStatistics(): Promise<any> {
+  getStatistics(): Promise<any> {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
@@ -217,7 +195,27 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async saveSystemConfig(config: any): Promise<boolean> {
+  getCourseCategories(params: any): Promise<{ list: any[]; total: number }> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const list = Array.from({ length: 5 }).map((_, index) => {
+          const id = index + 1
+          return {
+            id,
+            name: ['专业课', '家长必修', '精品专题', 'VIP专区', '其他'][index],
+            description: ['专业课程分类', '家长必修课程分类', '精品专题课程分类', 'VIP专区课程分类', '其他课程分类'][index],
+            sortOrder: index + 1,
+            status: true,
+            createTime: '2023-01-01',
+            updateTime: '2023-01-01'
+          }
+        })
+        resolve({ list, total: 5 })
+      }, 500)
+    })
+  },
+
+  saveSystemConfig(config: any): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(true)
@@ -225,7 +223,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async saveVipConfig(config: any): Promise<boolean> {
+  saveVipConfig(config: any): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(true)
@@ -233,7 +231,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async saveDistributorConfig(config: any): Promise<boolean> {
+  saveDistributorConfig(config: any): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(true)
@@ -241,7 +239,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async saveSmsConfig(config: any): Promise<boolean> {
+  saveSmsConfig(config: any): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(true)
@@ -249,7 +247,7 @@ export const mockDataService: MockDataService = {
     })
   },
 
-  async savePaymentConfig(config: any): Promise<boolean> {
+  savePaymentConfig(config: any): Promise<boolean> {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve(true)
@@ -257,3 +255,5 @@ export const mockDataService: MockDataService = {
     })
   }
 }
+
+export default mockData

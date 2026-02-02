@@ -1,33 +1,55 @@
 <template>
   <div class="page-container">
-    <div class="page-header">
-      <h2>素材库</h2>
-      <a-button type="primary" @click="handleAdd">添加素材</a-button>
-    </div>
-    <div class="page-content">
-      <a-form :model="queryForm" inline class="search-form">
+    <a-card class="search-card" :bordered="false">
+      <a-form :model="queryForm" layout="inline">
         <a-form-item label="素材名称">
-          <a-input v-model="queryForm.name" placeholder="请输入素材名称" allow-clear />
+          <a-input v-model="queryForm.name" placeholder="请输入素材名称" allow-clear style="width: 200px" />
         </a-form-item>
         <a-form-item label="素材类型">
-          <a-select v-model="queryForm.type" placeholder="请选择素材类型" allow-clear>
+          <a-select v-model="queryForm.type" placeholder="请选择素材类型" allow-clear style="width: 150px">
             <a-option label="全部" :value="0" />
             <a-option label="视频" :value="1" />
             <a-option label="音频" :value="2" />
           </a-select>
         </a-form-item>
         <a-form-item label="状态">
-          <a-select v-model="queryForm.status" placeholder="请选择状态" allow-clear>
+          <a-select v-model="queryForm.status" placeholder="请选择状态" allow-clear style="width: 120px">
             <a-option label="全部" :value="-1" />
             <a-option label="可用" :value="1" />
             <a-option label="禁用" :value="0" />
           </a-select>
         </a-form-item>
         <a-form-item>
-          <a-button type="primary" @click="handleSearch">搜索</a-button>
-          <a-button @click="handleReset">重置</a-button>
+          <a-space>
+            <a-button type="primary" @click="handleSearch">
+              <template #icon>
+                <icon-search />
+              </template>
+              搜索
+            </a-button>
+            <a-button @click="handleReset">
+              <template #icon>
+                <icon-refresh />
+              </template>
+              重置
+            </a-button>
+          </a-space>
         </a-form-item>
       </a-form>
+    </a-card>
+
+    <a-card class="table-card" :bordered="false">
+      <template #title>
+        <div class="card-title">
+          <span>素材库</span>
+          <a-button type="primary" @click="handleAdd">
+            <template #icon>
+              <icon-plus />
+            </template>
+            添加素材
+          </a-button>
+        </div>
+      </template>
 
       <a-table :data="tableData" :loading="loading" :columns="columns" :pagination="false" bordered>
         <template #column:type="{ record }">
@@ -66,7 +88,7 @@
           @page-size-change="handleSizeChange"
         />
       </div>
-    </div>
+    </a-card>
   </div>
 </template>
 
@@ -81,7 +103,9 @@ import {
   IconEye,
   IconVideoCamera,
   IconAudio,
-  IconDelete
+  IconDelete,
+  IconSearch,
+  IconRefresh
 } from '@arco-design/web-vue/es/icon'
 
 const router = useRouter()
@@ -265,17 +289,19 @@ function handleEdit(row: any) {
 
 function handlePreview(row: any) {
   // 预览素材
+  let mediaPlayer = ''
+  if (row.type === 1) {
+    // 视频预览
+    mediaPlayer = '<div class="media-player"><video controls width="600" height="400"><source src="' + row.url + '" type="video/mp4">您的浏览器不支持视频播放。</video></div>'
+  } else if (row.type === 2) {
+    // 音频预览
+    mediaPlayer = '<div class="media-player"><audio controls style="width: 100%;"><source src="' + row.url + '" type="audio/mp3">您的浏览器不支持音频播放。</audio></div>'
+  }
+
   Modal.info({
     title: '素材预览',
-    content: `
-      <div style="text-align: center;">
-        <h3>${row.name}</h3>
-        <p>类型: ${row.type === 1 ? '视频' : '音频'}</p>
-        <p>大小: ${formatFileSize(row.size)}</p>
-        <p>时长: ${formatDuration(row.duration)}</p>
-        <p>URL: ${row.url}</p>
-      </div>
-    `,
+    width: 700,
+    content: '<div><h3 style="text-align: center; margin-bottom: 20px;">' + row.name + '</h3>' + mediaPlayer + '<div class="material-info"><div class="info-item"><span class="info-label">类型:</span><span class="info-value">' + (row.type === 1 ? '视频' : '音频') + '</span></div><div class="info-item"><span class="info-label">大小:</span><span class="info-value">' + formatFileSize(row.size) + '</span></div><div class="info-item"><span class="info-label">时长:</span><span class="info-value">' + formatDuration(row.duration) + '</span></div><div class="info-item"><span class="info-label">状态:</span><span class="info-value">' + (row.status ? '可用' : '禁用') + '</span></div><div class="info-item"><span class="info-label">上传时间:</span><span class="info-value">' + row.createTime + '</span></div><div class="info-item"><span class="info-label">URL:</span><span class="info-value"><a href="' + row.url + '" target="_blank">' + row.url + '</a></span></div></div></div>',
     showCancel: false
   })
 }
@@ -325,20 +351,59 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
+.page-container {
+  .search-card {
+    margin-bottom: 16px;
+  }
 
-.search-form {
-  margin-bottom: 20px;
-}
+  .table-card {
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+  }
 
-.pagination-wrapper {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
+  .pagination-wrapper {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .media-player {
+    margin-top: 20px;
+    text-align: center;
+
+    video,
+    audio {
+      max-width: 100%;
+      border-radius: 4px;
+    }
+  }
+
+  .material-info {
+    margin-top: 20px;
+    padding: 16px;
+    background-color: #f7f9fc;
+    border-radius: 4px;
+    text-align: left;
+
+    .info-item {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+
+      .info-label {
+        width: 80px;
+        font-weight: 500;
+        color: #666;
+      }
+
+      .info-value {
+        color: #333;
+      }
+    }
+  }
 }
 </style>

@@ -10,7 +10,7 @@
       <div class="logo-container">
         <div class="logo">
           <div class="logo-icon">
-            <icon-file />
+            <IconFile />
           </div>
         </div>
         <div class="logo-text" v-if="!isCollapse">
@@ -20,8 +20,8 @@
       </div>
       <Sidebar :is-collapse="isCollapse" />
       <div class="collapse-trigger" @click="toggleCollapse">
-        <icon-file v-if="!isCollapse" />
-        <icon-file v-else />
+        <IconFile v-if="!isCollapse" />
+        <IconFile v-else />
       </div>
     </a-layout-sider>
     <a-layout>

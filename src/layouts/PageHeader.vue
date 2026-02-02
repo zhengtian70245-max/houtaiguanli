@@ -1,30 +1,30 @@
 <template>
   <div class="page-header">
     <div class="header-left">
-      <el-icon class="collapse-icon" @click="toggleSidebar">
-        <Fold />
-      </el-icon>
+      <a-icon class="collapse-icon" @click="toggleSidebar">
+        <IconMenuUnfold />
+      </a-icon>
       <span class="breadcrumb">
         {{ currentRoute.meta?.title }}
       </span>
     </div>
     <div class="header-right">
-      <el-dropdown @command="handleCommand">
+      <a-dropdown @select="handleCommand">
         <div class="user-info">
-          <el-avatar :size="36">{{ userStore.userInfo?.name?.charAt(0) }}</el-avatar>
+          <a-avatar :size="36">{{ userStore.userInfo?.name?.charAt(0) }}</a-avatar>
           <span class="user-name">{{ userStore.userInfo?.name }}</span>
-          <el-icon class="el-icon--right">
-            <arrow-down />
-          </el-icon>
+          <a-icon class="dropdown-icon">
+            <IconChevronDown />
+          </a-icon>
         </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="profile">个人中心</el-dropdown-item>
-            <el-dropdown-item command="setting">设置</el-dropdown-item>
-            <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
-          </el-dropdown-menu>
+        <template #content>
+          <a-dropdown-menu>
+            <a-dropdown-item key="profile">个人中心</a-dropdown-item>
+            <a-dropdown-item key="setting">设置</a-dropdown-item>
+            <a-dropdown-item key="logout" :divided="true">退出登录</a-dropdown-item>
+          </a-dropdown-menu>
         </template>
-      </el-dropdown>
+      </a-dropdown>
     </div>
   </div>
 </template>
@@ -34,6 +34,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useUserStore } from '@/stores/user'
+import { IconMenuUnfold, IconChevronDown } from '@arco-design/web-vue/es/icon'
 
 const route = useRoute()
 const router = useRouter()
@@ -98,7 +99,7 @@ function handleCommand(command: string) {
       align-items: center;
       cursor: pointer;
 
-      .avatar {
+      :deep(.arco-avatar) {
         margin-right: 8px;
       }
 
@@ -108,7 +109,7 @@ function handleCommand(command: string) {
         color: #333;
       }
 
-      .el-icon--right {
+      .dropdown-icon {
         font-size: 12px;
         color: #666;
       }

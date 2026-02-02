@@ -4,40 +4,38 @@
       <h2>VIP统计</h2>
     </div>
     <div class="page-content">
-      <el-row :gutter="24">
-        <el-col :span="6" v-for="stat in stats" :key="stat.key">
-          <el-card class="stat-card">
+      <a-row :gutter="[24, 24]">
+        <a-col :span="6" v-for="stat in stats" :key="stat.key">
+          <a-card class="stat-card">
             <div class="stat-icon" :style="{ background: stat.iconBg }">
-              <el-icon :size="32">
-                <component :is="stat.icon" />
-              </el-icon>
+              <component :is="stat.icon" />
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stat.value }}</div>
               <div class="stat-label">{{ stat.label }}</div>
             </div>
-          </el-card>
-        </el-col>
-      </el-row>
+          </a-card>
+        </a-col>
+      </a-row>
 
-      <el-row :gutter="24" style="margin-top: 24px;">
-        <el-col :span="12">
-          <el-card class="chart-card" body-style="padding: 20px">
+      <a-row :gutter="[24, 24]" style="margin-top: 24px;">
+        <a-col :span="12">
+          <a-card class="chart-card" :body-style="{ padding: '20px' }">
             <div class="chart-header">VIP发展趋势</div>
             <div class="chart-container">
               <div ref="vipChartRef" style="width: 100%; height: 300px;"></div>
             </div>
-          </el-card>
-        </el-col>
-        <el-col :span="12">
-          <el-card class="chart-card" body-style="padding: 20px">
+          </a-card>
+        </a-col>
+        <a-col :span="12">
+          <a-card class="chart-card" :body-style="{ padding: '20px' }">
             <div class="chart-header">VIP等级分布</div>
             <div class="chart-container">
               <div ref="levelChartRef" style="width: 100%; height: 300px;"></div>
             </div>
-          </el-card>
-        </el-col>
-      </el-row>
+          </a-card>
+        </a-col>
+      </a-row>
     </div>
   </div>
 </template>
@@ -45,16 +43,23 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
+import {
+  IconUser,
+  IconPlus,
+  IconCalendar,
+  IconDollarCircle,
+  IconBarChart
+} from '@arco-design/web-vue/es/icon'
 
 const stats = ref([
-  { key: 'totalVipUsers', label: '总VIP用户数', value: '2,580', icon: 'User', iconBg: '#f0f9eb' },
-  { key: 'todayNewVip', label: '今日新增VIP', value: '25', icon: 'Plus', iconBg: '#e6f7ff' },
-  { key: 'weekNewVip', label: '周新增VIP', value: '156', icon: 'Calendar', iconBg: '#fff7e6' },
-  { key: 'monthNewVip', label: '月新增VIP', value: '543', icon: 'CalendarFilled', iconBg: '#f6ffed' },
-  { key: 'totalVipIncome', label: '总VIP收入', value: '¥1,258,000', icon: 'Coin', iconBg: '#f5f0f8' },
-  { key: 'todayVipIncome', label: '今日VIP收入', value: '¥25,880', icon: 'TrendCharts', iconBg: '#fff0f6' },
-  { key: 'weekVipIncome', label: '周VIP收入', value: '¥125,800', icon: 'Calendar', iconBg: '#f6ffed' },
-  { key: 'monthVipIncome', label: '月VIP收入', value: '¥543,210', icon: 'TrendCharts', iconBg: '#fff7e6' }
+  { key: 'totalVipUsers', label: '总VIP用户数', value: '2,580', icon: IconUser, iconBg: '#f0f9eb' },
+  { key: 'todayNewVip', label: '今日新增VIP', value: '25', icon: IconPlus, iconBg: '#e6f7ff' },
+  { key: 'weekNewVip', label: '周新增VIP', value: '156', icon: IconCalendar, iconBg: '#fff7e6' },
+  { key: 'monthNewVip', label: '月新增VIP', value: '543', icon: IconCalendar, iconBg: '#f6ffed' },
+  { key: 'totalVipIncome', label: '总VIP收入', value: '¥1,258,000', icon: IconDollarCircle, iconBg: '#f5f0f8' },
+  { key: 'todayVipIncome', label: '今日VIP收入', value: '¥25,880', icon: IconBarChart, iconBg: '#fff0f6' },
+  { key: 'weekVipIncome', label: '周VIP收入', value: '¥125,800', icon: IconCalendar, iconBg: '#f6ffed' },
+  { key: 'monthVipIncome', label: '月VIP收入', value: '¥543,210', icon: IconBarChart, iconBg: '#fff7e6' }
 ])
 
 const vipChartRef = ref<HTMLElement>()
@@ -160,8 +165,9 @@ onMounted(() => {
     justify-content: center;
     margin-right: 16px;
 
-    .el-icon {
-      color: #fff;
+    :deep(.arco-icon) {
+      font-size: 32px;
+      color: #409eff;
     }
   }
 
@@ -171,13 +177,13 @@ onMounted(() => {
     .stat-value {
       font-size: 24px;
       font-weight: bold;
-      color: #333;
+      color: var(--arco-text-color-1);
       margin-bottom: 4px;
     }
 
     .stat-label {
       font-size: 14px;
-      color: #666;
+      color: var(--arco-text-color-3);
     }
   }
 }
@@ -189,7 +195,7 @@ onMounted(() => {
   .chart-header {
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: var(--arco-text-color-1);
     margin-bottom: 16px;
   }
 }

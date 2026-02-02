@@ -20,7 +20,7 @@
 
     <a-row :gutter="[24, 24]" style="margin-top: 24px;">
       <a-col :span="12">
-        <a-card class="chart-card" body-style="padding: 20px;">
+        <a-card class="chart-card" :body-style="{ padding: '20px' }">
           <div class="chart-header">用户增长趋势</div>
           <div class="chart-container">
             <div ref="userChartRef" style="width: 100%; height: 300px;"></div>

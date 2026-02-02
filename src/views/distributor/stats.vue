@@ -4,40 +4,38 @@
       <h2>分销统计</h2>
     </div>
     <div class="page-content">
-      <el-row :gutter="24">
-        <el-col :span="6" v-for="stat in stats" :key="stat.key">
-          <el-card class="stat-card">
+      <a-row :gutter="[24, 24]">
+        <a-col :span="6" v-for="stat in stats" :key="stat.key">
+          <a-card class="stat-card">
             <div class="stat-icon" :style="{ background: stat.iconBg }">
-              <el-icon :size="32">
-                <component :is="stat.icon" />
-              </el-icon>
+              <component :is="stat.icon" />
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stat.value }}</div>
               <div class="stat-label">{{ stat.label }}</div>
             </div>
-          </el-card>
-        </el-col>
-      </el-row>
+          </a-card>
+        </a-col>
+      </a-row>
 
-      <el-row :gutter="24" style="margin-top: 24px;">
-        <el-col :span="12">
-          <el-card class="chart-card" body-style="padding: 20px">
+      <a-row :gutter="[24, 24]" style="margin-top: 24px;">
+        <a-col :span="12">
+          <a-card class="chart-card" :body-style="{ padding: '20px' }">
             <div class="chart-header">分销商发展趋势</div>
             <div class="chart-container">
               <div ref="distributorChartRef" style="width: 100%; height: 300px;"></div>
             </div>
-          </el-card>
-        </el-col>
-        <el-col :span="12">
-          <el-card class="chart-card" body-style="padding: 20px">
+          </a-card>
+        </a-col>
+        <a-col :span="12">
+          <a-card class="chart-card" :body-style="{ padding: '20px' }">
             <div class="chart-header">佣金发放分布</div>
             <div class="chart-container">
               <div ref="commissionChartRef" style="width: 100%; height: 300px;"></div>
             </div>
-          </el-card>
-        </el-col>
-      </el-row>
+          </a-card>
+        </a-col>
+      </a-row>
     </div>
   </div>
 </template>
@@ -45,16 +43,23 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
+import {
+  IconUser,
+  IconPlus,
+  IconCalendar,
+  IconDollarCircle,
+  IconBarChart
+} from '@arco-design/web-vue/es/icon'
 
 const stats = ref([
-  { key: 'totalDistributors', label: '总分销商数', value: '368', icon: 'User', iconBg: '#f0f9eb' },
-  { key: 'todayNewDistributors', label: '今日新增分销商', value: '12', icon: 'Plus', iconBg: '#e6f7ff' },
-  { key: 'weekDistributors', label: '周分销商', value: '156', icon: 'Calendar', iconBg: '#fff7e6' },
-  { key: 'monthDistributors', label: '月分销商', value: '543', icon: 'CalendarFilled', iconBg: '#f6ffed' },
-  { key: 'totalCommissions', label: '总佣金发放', value: '¥1,258,000', icon: 'Coin', iconBg: '#f5f0f8' },
-  { key: 'todayCommissions', label: '今日佣金', value: '¥12,580', icon: 'TrendCharts', iconBg: '#f0f5ff' },
-  { key: 'weekCommissions', label: '周佣金发放', value: '¥85,690', icon: 'Calendar', iconBg: '#f0f9eb' },
-  { key: 'monthCommissions', label: '月佣金发放', value: '¥1,258,000', icon: 'TrendCharts', iconBg: '#e6f7ff' }
+  { key: 'totalDistributors', label: '总分销商数', value: '368', icon: IconUser, iconBg: '#f0f9eb' },
+  { key: 'todayNewDistributors', label: '今日新增分销商', value: '12', icon: IconPlus, iconBg: '#e6f7ff' },
+  { key: 'weekDistributors', label: '周分销商', value: '156', icon: IconCalendar, iconBg: '#fff7e6' },
+  { key: 'monthDistributors', label: '月分销商', value: '543', icon: IconCalendar, iconBg: '#f6ffed' },
+  { key: 'totalCommissions', label: '总佣金发放', value: '¥1,258,000', icon: IconDollarCircle, iconBg: '#f5f0f8' },
+  { key: 'todayCommissions', label: '今日佣金', value: '¥12,580', icon: IconBarChart, iconBg: '#f0f5ff' },
+  { key: 'weekCommissions', label: '周佣金发放', value: '¥85,690', icon: IconCalendar, iconBg: '#f0f9eb' },
+  { key: 'monthCommissions', label: '月佣金发放', value: '¥1,258,000', icon: IconBarChart, iconBg: '#e6f7ff' }
 ])
 
 const distributorChartRef = ref<HTMLElement>()

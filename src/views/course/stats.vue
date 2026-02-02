@@ -4,40 +4,38 @@
       <h2>课程统计</h2>
     </div>
     <div class="page-content">
-      <el-row :gutter="24">
-        <el-col :span="6" v-for="stat in stats" :key="stat.key">
-          <el-card class="stat-card">
+      <a-row :gutter="24">
+        <a-col :span="6" v-for="stat in stats" :key="stat.key">
+          <a-card class="stat-card">
             <div class="stat-icon" :style="{ background: stat.iconBg }">
-              <el-icon :size="32">
-                <component :is="stat.icon" />
-              </el-icon>
+              <a-icon :icon="stat.icon" :size="32" />
             </div>
             <div class="stat-content">
               <div class="stat-value">{{ stat.value }}</div>
               <div class="stat-label">{{ stat.label }}</div>
             </div>
-          </el-card>
-        </el-col>
-      </el-row>
+          </a-card>
+        </a-col>
+      </a-row>
 
-      <el-row :gutter="24" style="margin-top: 24px;">
-        <el-col :span="12">
-          <el-card class="chart-card" body-style="padding: 20px">
+      <a-row :gutter="24" style="margin-top: 24px;">
+        <a-col :span="12">
+          <a-card class="chart-card" body-style="padding: 20px">
             <div class="chart-header">课程学习趋势</div>
             <div class="chart-container">
               <div ref="courseChartRef" style="width: 100%; height: 300px;"></div>
             </div>
-          </el-card>
-        </el-col>
-        <el-col :span="12">
-          <el-card class="chart-card" body-style="padding: 20px">
+          </a-card>
+        </a-col>
+        <a-col :span="12">
+          <a-card class="chart-card" body-style="padding: 20px">
             <div class="chart-header">课程分类分布</div>
             <div class="chart-container">
               <div ref="categoryChartRef" style="width: 100%; height: 300px;"></div>
             </div>
-          </el-card>
-        </el-col>
-      </el-row>
+          </a-card>
+        </a-col>
+      </a-row>
     </div>
   </div>
 </template>
@@ -45,16 +43,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
+import { IconDocument, IconReading, IconCalendar, IconCalendarFilled, IconView, IconTrendCharts } from '@arco-design/web-vue/es/icon'
 
 const stats = ref([
-  { key: 'totalCourses', label: '总课程数', value: '458', icon: 'Document', iconBg: '#f0f9eb' },
-  { key: 'todayLearning', label: '今日学习人数', value: '1,258', icon: 'Reading', iconBg: '#e6f7ff' },
-  { key: 'weekLearning', label: '周学习人数', value: '2,568', icon: 'Calendar', iconBg: '#fff7e6' },
-  { key: 'monthLearning', label: '月学习人数', value: '8,586', icon: 'CalendarFilled', iconBg: '#f6ffed' },
-  { key: 'totalViews', label: '总浏览量', value: '58,696', icon: 'View', iconBg: '#f5f0f8' },
-  { key: 'todayViews', label: '今日浏览量', value: '1,568', icon: 'TrendCharts', iconBg: '#fff0f6' },
-  { key: 'weekViews', label: '周浏览量', value: '8,568', icon: 'Calendar', iconBg: '#f6ffed' },
-  { key: 'monthViews', label: '月浏览量', value: '35,689', icon: 'TrendCharts', iconBg: '#f0f5ff' }
+  { key: 'totalCourses', label: '总课程数', value: '458', icon: IconDocument, iconBg: '#f0f9eb' },
+  { key: 'todayLearning', label: '今日学习人数', value: '1,258', icon: IconReading, iconBg: '#e6f7ff' },
+  { key: 'weekLearning', label: '周学习人数', value: '2,568', icon: IconCalendar, iconBg: '#fff7e6' },
+  { key: 'monthLearning', label: '月学习人数', value: '8,586', icon: IconCalendarFilled, iconBg: '#f6ffed' },
+  { key: 'totalViews', label: '总浏览量', value: '58,696', icon: IconView, iconBg: '#f5f0f8' },
+  { key: 'todayViews', label: '今日浏览量', value: '1,568', icon: IconTrendCharts, iconBg: '#fff0f6' },
+  { key: 'weekViews', label: '周浏览量', value: '8,568', icon: IconCalendar, iconBg: '#f6ffed' },
+  { key: 'monthViews', label: '月浏览量', value: '35,689', icon: IconTrendCharts, iconBg: '#f0f5ff' }
 ])
 
 const courseChartRef = ref<HTMLElement>()
@@ -160,7 +159,7 @@ onMounted(() => {
     justify-content: center;
     margin-right: 16px;
 
-    .el-icon {
+    :deep(.arco-icon) {
       color: #fff;
     }
   }

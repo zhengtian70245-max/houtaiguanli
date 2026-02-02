@@ -21,7 +21,7 @@
             <a-badge :count="messageCount" :max-count="99">
               <a-button type="text" class="action-btn">
                 <template #icon>
-                  <icon-file />
+                  <IconNotification />
                 </template>
               </a-button>
             </a-badge>
@@ -29,7 +29,7 @@
           <a-tooltip content="帮助中心">
             <a-button type="text" class="action-btn">
               <template #icon>
-                <icon-file />
+                <IconQuestionCircle />
               </template>
             </a-button>
           </a-tooltip>
@@ -42,27 +42,27 @@
                 <span class="user-name">{{ userStore.userInfo?.name || userStore.userInfo?.username }}</span>
                 <span class="user-role">{{ userStore.userInfo?.role || '管理员' }}</span>
               </div>
-              <icon-file class="dropdown-icon" />
+              <IconDown class="dropdown-icon" />
             </div>
             <template #content>
-              <a-doption value="profile">
+              <a-dropdown-item value="profile">
                 <template #icon>
-                  <icon-file />
+                  <IconUser />
                 </template>
                 个人信息
-              </a-doption>
-              <a-doption value="settings">
+              </a-dropdown-item>
+              <a-dropdown-item value="settings">
                 <template #icon>
-                  <icon-file />
+                  <IconSettings />
                 </template>
                 账号设置
-              </a-doption>
-              <a-doption value="logout">
+              </a-dropdown-item>
+              <a-dropdown-item value="logout">
                 <template #icon>
-                  <icon-file />
+                  <IconPoweroff />
                 </template>
                 退出登录
-              </a-doption>
+              </a-dropdown-item>
             </template>
           </a-dropdown>
         </a-space>
@@ -77,7 +77,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { Message, Modal } from '@arco-design/web-vue'
 import {
-  IconFile
+  IconNotification,
+  IconQuestionCircle,
+  IconUser,
+  IconSettings,
+  IconPoweroff,
+  IconDown
 } from '@arco-design/web-vue/es/icon'
 
 const route = useRoute()

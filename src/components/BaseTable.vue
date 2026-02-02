@@ -1,51 +1,52 @@
 <template>
   <div class="base-table">
-    <el-table :data="tableData" :height="height" :border="border" :stripe="stripe">
-      <template v-for="col in columns" :key="col.prop">
-        <el-table-column v-if="!col.slot" :prop="col.prop" :label="col.label" :width="col.width" :min-width="col.minWidth" :align="col.align">
-          <template #default="{ row }">
+    <a-table :data="tableData" :height="height" :border="border" :stripe="stripe">
+      <template v-for="col in columns" :key="col.properties">
+        <a-table-column v-if="!col.slot" :prop="col.properties" :label="col.label" :width="col.width" :min-width="col.minWidth" :align="col.align">
+          <template #default="{ record }">
             <template v-if="col.type === 'status'">
-              <el-tag :type="getStatusType(row[col.prop!])">{{ getStatusText(row[col.prop!]) }}</el-tag>
+              <a-tag :color="getStatusColor(record[col.properties])">{{ getStatusText(record[col.properties]) }}</a-tag>
             </template>
             <template v-else-if="col.type === 'level'">
-              <el-tag :type="getLevelType(row[col.prop!])">{{ getLevelText(row[col.prop!]) }}</el-tag>
+              <a-tag :color="getLevelColor(record[col.properties])">{{ getLevelText(record[col.properties]) }}</a-tag>
             </template>
             <template v-else-if="col.type === 'date'">
-              {{ formatDate(row[col.prop!]) }}
+              {{ formatDate(record[col.properties]) }}
             </template>
             <template v-else-if="col.type === 'money'">
-              {{ formatMoney(row[col.prop!]) }}
+              {{ formatMoney(record[col.properties]) }}
             </template>
             <template v-else>
-              {{ row[col.prop!] }}
+              {{ record[col.properties] }}
             </template>
           </template>
-        </el-table-column>
-        <el-table-column v-else :label="col.label" :width="col.width" :min-width="col.minWidth" :align="col.align">
-          <template #default="{ row }">
-            <slot :name="col.slot" :row="row" />
+        </a-table-column>
+        <a-table-column v-else :label="col.label" :width="col.width" :min-width="col.minWidth" :align="col.align">
+          <template #default="{ record }">
+            <slot :name="col.slot" :record="record" />
           </template>
-        </el-table-column>
+        </a-table-column>
       </template>
-      <el-table-column v-if="actions" label="操作" align="center" :width="actionsWidth">
-        <template #default="{ row }">
+      <a-table-column v-if="actions" label="操作" align="center" :width="actionsWidth">
+        <template #default="{ record }">
           <template v-for="action in actions" :key="action.type">
-            <el-button :type="action.type" :size="action.size" :icon="action.icon" :disabled="action.disabled && action.disabled(row)" @click="handleAction(action, row)">
+            <a-button :type="action.type" :size="action.size" :icon="action.icon" :disabled="action.disabled && action.disabled(record)" @click="handleAction(action, record)">
               {{ action.label }}
-            </el-button>
+            </a-button>
           </template>
         </template>
-      </el-table-column>
-    </el-table>
+      </a-table-column>
+    </a-table>
     <div class="pagination-wrapper" v-if="showPagination">
-      <el-pagination
-        v-model:current-page="pagination.page"
+      <a-pagination
+        v-model:page="pagination.page"
         v-model:page-size="pagination.size"
-        :page-sizes="[10, 20, 50, 100]"
-        layout="total, sizes, prev, pager, next, jumper"
+        :page-size-options="[10, 20, 50, 100]"
+        :show-size-changer="true"
+        :show-quick-jumper="true"
         :total="pagination.total"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
+        @page-change="handleCurrentChange"
+        @page-size-change="handleSizeChange"
       />
     </div>
   </div>
@@ -98,12 +99,12 @@ const emit = defineEmits(['size-change', 'current-change', 'action'])
 
 const pagination = computed(() => props.pagination)
 
-function getStatusType(status: number): string {
-  const typeMap: Record<number, string> = {
-    0: 'danger',
-    1: 'success'
+function getStatusColor(status: number): string {
+  const colorMap: Record<number, string> = {
+    0: 'red',
+    1: 'green'
   }
-  return typeMap[status] || 'info'
+  return colorMap[status] || 'blue'
 }
 
 function getStatusText(status: number): string {
@@ -114,14 +115,14 @@ function getStatusText(status: number): string {
   return textMap[status] || '未知'
 }
 
-function getLevelType(level: number): string {
-  const typeMap: Record<number, string> = {
-    1: 'info',
-    2: 'primary',
-    3: 'warning',
-    4: 'danger'
+function getLevelColor(level: number): string {
+  const colorMap: Record<number, string> = {
+    1: 'blue',
+    2: 'purple',
+    3: 'orange',
+    4: 'red'
   }
-  return typeMap[level] || 'info'
+  return colorMap[level] || 'blue'
 }
 
 function getLevelText(level: number): string {
@@ -151,8 +152,8 @@ function handleCurrentChange(page: number) {
   emit('current-change', page)
 }
 
-function handleAction(action: Action, row: any) {
-  emit('action', action, row)
+function handleAction(action: Action, record: any) {
+  emit('action', action, record)
 }
 </script>
 
